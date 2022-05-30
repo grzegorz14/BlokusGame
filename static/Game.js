@@ -1,5 +1,6 @@
-import Segment from "./Segment.js"
 import Tile from "./Tile.js"
+import Block from "./Block.js"
+import Blocks from "./blocks.js"
 
 class Game {
     constructor() {
@@ -8,7 +9,7 @@ class Game {
         this.mouseVector = new THREE.Vector2()
     
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 10000)
-        this.camera.position.set(0, 300, 400)
+        this.camera.position.set(0, 400, 500)
         this.camera.lookAt(this.scene.position)
     
         this.renderer = new THREE.WebGLRenderer({ antialias: true })
@@ -48,7 +49,7 @@ class Game {
         for (let i = 0; i < 14; i++) {
             for (let j = 0; j < 14; j++) {
                 tile = new Tile(i ,j)
-                tile.position.set(175 - j * 50, -10, 175 - i * 50)
+                tile.position.set(325 - j * 50, -10, 325 - i * 50)
                 this.tiles.push(tile)
                 this.scene.add(tile)
             }
@@ -57,16 +58,15 @@ class Game {
 
     createBlocks = () => {
         let block
-        let id = 0
-        for (let i = 0; i < this.blocks.length; i++) {
-            block = new Mepel(id++, this.boardState[i][j], i, j)
-            block.position.set(175 - i * 50, 10, 175 - i * 50)
+        Blocks.blocks.map(shape => {
+            block = new Block(shape, this.player)
             this.scene.add(block)
-        }
+            this.blocks.push(block)
+        })
     }
 
     setPlayerPosition = () => {
-        this.camera.position.set(0, 300, this.player == 2 ? 400 : -400)
+        this.camera.position.set(0, 400, this.player == 2 ? 500 : -500)
         this.camera.lookAt(this.scene.position)
     }
 
