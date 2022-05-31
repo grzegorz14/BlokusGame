@@ -75,11 +75,12 @@ class Net {
         if (this.game.player == 2) {
             this.startTimer()
             //this.game.yourTurn = false;
-        } 
+        }
         else {
             //this.game.yourTurn = true;
         }
 
+        this.game.createBoard()
         this.game.createBlocks()
         this.game.setPlayerPosition()
 

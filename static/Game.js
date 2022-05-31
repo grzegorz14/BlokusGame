@@ -7,15 +7,15 @@ class Game {
         this.scene = new THREE.Scene()
         this.raycaster = new THREE.Raycaster()
         this.mouseVector = new THREE.Vector2()
-    
+
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 10000)
-        this.camera.position.set(0, 400, 500)
+        this.camera.position.set(0, 240, 140)
         this.camera.lookAt(this.scene.position)
-    
+
         this.renderer = new THREE.WebGLRenderer({ antialias: true })
         this.renderer.setClearColor(0x000000)
         this.renderer.setSize(window.innerWidth, window.innerHeight)
-    
+
         document.getElementById("root").append(this.renderer.domElement)
 
         this.player = null
@@ -24,8 +24,6 @@ class Game {
         this.blocks = []
         this.tiles = []
 
-        this.createBoard()
-    
         // onClick on object
         let object = null
         window.addEventListener("mousedown", async (e) => {
@@ -33,14 +31,14 @@ class Game {
             this.mouseVector.y = -(e.clientY / window.innerHeight) * 2 + 1
             this.raycaster.setFromCamera(this.mouseVector, this.camera)
             const intersects = this.raycaster.intersectObjects(this.scene.children)
-    
+
             if (intersects.length > 0) {
                 object = intersects[0].object
-    
+
                 //check if object is a block
             }
         });
-    
+
         this.render()
     }
 
@@ -48,8 +46,8 @@ class Game {
         let tile
         for (let i = 0; i < 14; i++) {
             for (let j = 0; j < 14; j++) {
-                tile = new Tile(i ,j)
-                tile.position.set(325 - j * 50, -10, 325 - i * 50)
+                tile = new Tile(i, j)
+                tile.position.set(65 - j * 10, 0, 65 - i * 10)
                 this.tiles.push(tile)
                 this.scene.add(tile)
             }
@@ -58,15 +56,16 @@ class Game {
 
     createBlocks = () => {
         let block
-        Blocks.blocks.map(shape => {
-            block = new Block(shape, this.player)
+        Blocks.blocks.map((shape, i) => {
+            block = new Block(shape, this.player).getBlock()
+            block.position.set(160 + (i % 4) * 40, 10, 40 )
             this.scene.add(block)
             this.blocks.push(block)
         })
     }
 
     setPlayerPosition = () => {
-        this.camera.position.set(0, 400, this.player == 2 ? 500 : -500)
+        this.camera.position.set(0, 240, this.player == 2 ? 140 : -140)
         this.camera.lookAt(this.scene.position)
     }
 

@@ -1,13 +1,12 @@
 class Segment extends THREE.Mesh {
-    constructor(row, column) {
+    constructor() {
         super()
-        this.row = row
-        this.column = column
-        
-        this.geometry = new THREE.BoxGeometry(50, 18, 50)
+
+        this.geometry = new THREE.CylinderGeometry(4, 8, 4, 4)
+        this.rotation.y = Math.PI / 4
         this.material = new THREE.MeshBasicMaterial({
             side: THREE.DoubleSide,
-            map: new THREE.TextureLoader().load('https://i.imgur.com/GBQ4ZZL.png')
+            map: new THREE.TextureLoader().load('https://i.imgur.com/7GJw4NQ.png')
         })
     }
 }
