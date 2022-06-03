@@ -44,7 +44,7 @@ class Net {
         let response = await fetch("/reset", { method: "post" })
         await response.json().then(data => {
             if (data.success) {
-                alert("New game! Log in")
+                //alert("New game! Log in")
             }
         })
     }
@@ -81,7 +81,10 @@ class Net {
         }
 
         this.game.createBoard()
-        this.game.createBlocks()
+        //this.game.createBlocks() <- Debug Code
+        this.ui.addBlocks()
+        this.ui.show(this.ui.yourBlocks)
+        this.ui.show(this.ui.opponentsBlocks)
         this.game.setPlayerPosition()
 
         this.updateInterval = setInterval(this.update, 200)
@@ -119,21 +122,14 @@ class Net {
         }, 1000)
     }
 
-    win = () => {
+    gameEnd = (message) => {
+        this.ui.hide(this.ui.yourBlocks)
+        this.ui.hide(this.ui.opponentsBlocks)
         this.ui.hide(this.ui.dialog)
         this.ui.hide(this.ui.counter)
         this.ui.addMist()
 
-        this.ui.dialog.innerText = "YOU WIN!"
-        this.ui.show(this.ui.dialog)
-    }
-
-    lose = () => {
-        this.ui.hide(this.ui.dialog)
-        this.ui.hide(this.ui.counter)
-        this.ui.addMist()
-
-        this.ui.dialog.innerText = "YOU LOSE!"
+        this.ui.dialog.innerText = message
         this.ui.show(this.ui.dialog)
     }
 }

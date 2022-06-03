@@ -12,20 +12,33 @@ body {
     font-size: 20px;
 }
 
-#topBar {
+.tilesContainer {
+    overflow-x: hidden; 
+    overflow-y: auto;
     position: absolute;
     top: 0;
-    left: 0;
-    width: 100%;
-    height: 60px;
+    width: 10%;
+    height: 100%;
     background-color: green;
-    display: flex;
-    flex-direction: row;
-    text-align: left;
-    align-items: center;
-    border-bottom: 2px solid lime;
-    padding-left: 20px;
     z-index: 9;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#yourBlocks {
+    background-color: green;
+    left: 0;
+}
+
+#opponentsBlocks {
+    background-color: blue;
+    right: 0;
+}
+
+.block {
+    margin: 10px;
+    padding: 10px;
 }
 
 h1 {

@@ -2,7 +2,7 @@ class Segment extends THREE.Mesh {
     constructor() {
         super()
 
-        this.geometry = new THREE.CylinderGeometry(4, 8, 4, 4)
+        this.geometry = new THREE.CylinderGeometry(6, Math.sqrt(2) * 5, 4, 4)
         this.rotation.y = Math.PI / 4
         this.material = new THREE.MeshBasicMaterial({
             side: THREE.DoubleSide,
