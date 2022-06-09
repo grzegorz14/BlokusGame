@@ -42,7 +42,7 @@ class Game {
         });
 
         window.addEventListener("keydown", (e) => {
-            console.log(e.keyCode)
+            //console.log(e.keyCode)
             let h = this.placementHelper.shape[1].length
             let w = this.placementHelper.shape.length
             // Movement Code
@@ -82,7 +82,7 @@ class Game {
                 this.placementHelper.position.x -= 10
                 this.placementCoords.x += 1
             }
-            console.log(this.placementCoords)
+            //console.log(this.placementCoords)
             // use e.keyCode
         })
 

@@ -84,7 +84,8 @@ class Net {
 
         this.game.createBoard()
         //this.game.createBlocks() <- Debug Code
-        this.ui.addBlocks(this.game.player, this.game.blockButtonClick)
+        this.ui.addBlocks(this.game.player, this.game.blockButtonClick, this.finishButtonClick, this.login)
+        this.ui.show(this.ui.moveBox)
         this.ui.show(this.ui.yourBlocks)
         this.ui.show(this.ui.opponentsBlocks)
         this.game.setPlayerPosition()
@@ -126,7 +127,14 @@ class Net {
         }, 1000)
     }
 
+    finishButtonClick = (player) => {
+        if (!confirm("Are you sure? You won't take anymore turns.")) return
+
+        console.log("Finish click, player " + player)
+    }
+
     gameEnd = (message) => {
+        this.ui.hide(this.ui.moveBox)
         this.ui.hide(this.ui.yourBlocks)
         this.ui.hide(this.ui.opponentsBlocks)
         this.ui.hide(this.ui.dialog)
