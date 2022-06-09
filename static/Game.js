@@ -117,6 +117,10 @@ class Game {
         this.camera.lookAt(this.scene.position)
     }
 
+    blockButtonClick = (shape) => {
+        console.log(shape)
+    }
+
     render = () => {
         TWEEN.update()
         requestAnimationFrame(this.render)

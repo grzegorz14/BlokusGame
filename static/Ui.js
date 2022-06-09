@@ -29,32 +29,34 @@ class Ui {
         element.classList.add("invisible")
     }
 
-    addBlocks = (player) => {
+    addBlocks = (player, clickEvent) => {
         console.log("Player: " + player)
-        let blocksText = ""
+        //your blocks
         Blocks.blocks.map((block, i) => {
-            let blockText = ""
+            const button = document.createElement("button")
+            button.addEventListener("click", () => clickEvent(block))
+            button.classList.add("block")
             for (let i = 0; i < block.length; i++) {
                 for (let j = 0; j < block[i].length; j++) {
-                    blockText += block[i][j] == 1 ? (player == 1 ?  "🟩" : "🟦") : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                    button.innerHTML += block[i][j] == 1 ? (player == 1 ?  "🟩" : "🟦") : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
                 }
-                blockText += "<br/>"
+                button.innerHTML += "<br/>"
             }
-            blocksText += "<button class=\"block\">" + blockText + "</button>"
+            this.yourBlocks.appendChild(button)
         })
-        this.yourBlocks.innerHTML += blocksText
-        blocksText = ""
-        Blocks.blocks.map((block, i) => {
-            let blockText = ""
+        
+        //opponent's blocks
+        Blocks.blocks.map((block, i) => { 
+            const button = document.createElement("button")
+            button.classList.add("block")
             for (let i = 0; i < block.length; i++) {
                 for (let j = 0; j < block[i].length; j++) {
-                    blockText += block[i][j] == 1 ? (player == 1 ?  "🟦" : "🟩") : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                    button.innerHTML += block[i][j] == 1 ? (player == 1 ?  "🟦" : "🟩") : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
                 }
-                blockText += "<br/>"
+                button.innerHTML += "<br/>"
             }
-            blocksText += "<button class=\"block\">" + blockText + "</button>"
+            this.opponentsBlocks.appendChild(button)
         })
-        this.opponentsBlocks.innerHTML += blocksText
 
         document.getElementById("yourBlocks").style.backgroundColor = player == 1 ?  "#285D34" : "#0B0B60";
         document.getElementById("opponentsBlocks").style.backgroundColor = player == 1 ?  "#0B0B60" : "#285D34";

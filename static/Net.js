@@ -84,7 +84,7 @@ class Net {
 
         this.game.createBoard()
         //this.game.createBlocks() <- Debug Code
-        this.ui.addBlocks(this.game.player)
+        this.ui.addBlocks(this.game.player, this.game.blockButtonClick)
         this.ui.show(this.ui.yourBlocks)
         this.ui.show(this.ui.opponentsBlocks)
         this.game.setPlayerPosition()
