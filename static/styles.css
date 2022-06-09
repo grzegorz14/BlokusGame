@@ -1,6 +1,7 @@
 * {
     margin: 0;
     padding: 0;
+    color: white;
 }
 
 body {
@@ -8,8 +9,12 @@ body {
     overflow-x: hidden;
     background-color: black;
     font-family: monospace;
-    color: lime;
     font-size: 20px;
+}
+
+h1 {
+    font-size: 50px;
+    margin-bottom: 5px;
 }
 
 .tilesContainer {
@@ -17,22 +22,22 @@ body {
     overflow-y: auto;
     position: absolute;
     top: 0;
+    height: 100vh;
     width: 10%;
-    height: 100%;
-    background-color: green;
-    z-index: 9;
+    background-color: #285D34;
+    z-index: 20;
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
 
 #yourBlocks {
-    background-color: green;
+    background-color: #285D34;
     left: 0;
 }
 
 #opponentsBlocks {
-    background-color: blue;
+    background-color: #0B0B60;
     right: 0;
 }
 
@@ -41,55 +46,63 @@ body {
     padding: 10px;
 }
 
-h1 {
-    color: lime;
+#background {
+    width: 100%;
 }
 
 #logingDialog {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    height: 100vh;
+    width: 100%;
     display: flex;
-    flex-direction: column;
-    padding: 20px;
     align-items: center;
     justify-content: center;
-    border: 2px solid lime;
-    border-radius: 10px;
     z-index: 10;
+    background-image: url("./textures/background2.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.logingBox {
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
+    align-items: center;
+    justify-content: center;
+    /* border: 2px solid white; */
+    border-radius: 10px;
+    background: #111111;
 }
 
 input[type="text"] {
+    text-align: center;
     padding: 5px;
-    margin: 5px;
-    font-size: 16px;
+    margin: 15px;
+    font-size: 20px;
     border-radius: 10px;
     background-color: transparent;
-    border: 2px solid lime;
-    color: lime;
+    border: 2px solid white;
 }
 
 ::placeholder {
-    color: lime;
+    color: white;
 }
 
 .dialogButton {
-    border: lime;
+    border: white;
     border-radius: 10px;
-    padding: 5px;
-    font-size: 16px;
-    background-color: lime;
+    padding: 8px;
+    font-size: 18px;
+    background-color: white;
     color: black;
     font-weight: bold;
-    margin: 5px;
-    width: 120px;
+    margin: 10px;
+    width: 140px;
+    transition: 300ms;
 }
 
 .dialogButton:hover {
-    color: lime;
-    background-color: green;
-    transition: 300ms;
+    background-color: gray;
 }
 
 #dialog {
@@ -117,4 +130,11 @@ input[type="text"] {
 
 .invisible {
     visibility: hidden;
+}
+
+#root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: -1;
 }
