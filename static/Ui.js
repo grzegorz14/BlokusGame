@@ -29,20 +29,35 @@ class Ui {
         element.classList.add("invisible")
     }
 
-    addBlocks = () => {
+    addBlocks = (player) => {
+        console.log("Player: " + player)
         let blocksText = ""
         Blocks.blocks.map((block, i) => {
             let blockText = ""
             for (let i = 0; i < block.length; i++) {
                 for (let j = 0; j < block[i].length; j++) {
-                    blockText += block[i][j] == 1 ? "🟩" : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                    blockText += block[i][j] == 1 ? (player == 1 ?  "🟩" : "🟦") : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
                 }
                 blockText += "<br/>"
             }
             blocksText += "<button class=\"block\">" + blockText + "</button>"
         })
         this.yourBlocks.innerHTML += blocksText
+        blocksText = ""
+        Blocks.blocks.map((block, i) => {
+            let blockText = ""
+            for (let i = 0; i < block.length; i++) {
+                for (let j = 0; j < block[i].length; j++) {
+                    blockText += block[i][j] == 1 ? (player == 1 ?  "🟦" : "🟩") : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                }
+                blockText += "<br/>"
+            }
+            blocksText += "<button class=\"block\">" + blockText + "</button>"
+        })
         this.opponentsBlocks.innerHTML += blocksText
+
+        document.getElementById("yourBlocks").style.backgroundColor = player == 1 ?  "#285D34" : "#0B0B60";
+        document.getElementById("opponentsBlocks").style.backgroundColor = player == 1 ?  "#0B0B60" : "#285D34";
     }
 }
 
