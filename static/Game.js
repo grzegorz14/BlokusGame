@@ -21,7 +21,7 @@ class Game {
         this.player = null
         this.opponent = null
 
-        this.blocks = {player: Block.blocks, opponent: Block.blocks}
+        this.blocks = { player: Block.blocks, opponent: Block.blocks }
         this.tiles = []
 
         // onClick on object
@@ -34,128 +34,76 @@ class Game {
 
             if (intersects.length > 0) {
                 object = intersects[0].object
-                if ( object instanceof Tile){
+                if (object instanceof Tile) {
                     console.log("made Block")
-                    
+
                 }
             }
         });
 
         window.addEventListener("keydown", (e) => {
             console.log(e.keyCode)
+            let h = this.placementHelper.shape[1].length
+            let w = this.placementHelper.shape.length
+            // Movement Code
             if (e.keyCode == 81) {
-                console.log("left")
-                this.placementHelper.fullRotate(true)
+                // Rotate Helper Left
+                this.placementCoords.z += this.placementHelper.fullRotate(true)
                 this.placementCoords.rot += 1
                 this.placementCoords.rot = this.placementCoords.rot % 4
             } else if (e.keyCode == 69) {
-                console.log("right")
-                this.placementHelper.fullRotate(false)
-                this.placementCoords.rot += 1
+                // Rotate Helper Right
+                this.placementCoords.z += this.placementHelper.fullRotate(false)
+                this.placementCoords.rot -= 1
                 this.placementCoords.rot = this.placementCoords.rot % 4
             }
-            
-            if (e.keyCode == 87) {
+
+            if (e.keyCode == 87 && this.placementCoords.z > 0) {
+                // Move helper up
                 this.placementHelper.position.z += 10
                 this.placementCoords.z -= 1
-            } else if (e.keyCode == 83) {
+            } else if (e.keyCode == 83 && this.placementCoords.z < (14 - ((this.placementHelper.rotationID % 2 == 0) ? h : w))) {
+                // Move helper down
                 this.placementHelper.position.z -= 10
                 this.placementCoords.z += 1
-            } 
-            
-            if (e.keyCode == 65) {
+            }
+
+            if (e.keyCode == 65 && this.placementCoords.x > 0) {
+                // Move helper left
                 this.placementHelper.position.x += 10
                 this.placementCoords.x -= 1
-            } else if (e.keyCode == 68) {
+            } else if (e.keyCode == 68 && this.placementCoords.x < (14 - ((this.placementHelper.rotationID % 2 == 0) ? w : h))) {
+                // Move helper right
                 this.placementHelper.position.x -= 10
                 this.placementCoords.x += 1
             }
+
+            let overflowX = this.placementCoords.x + ((this.placementHelper.rotationID % 2 == 0) ? w : h) - 14
+            let overflowZ = -this.placementCoords.z
+            if (overflowX > 0) {
+                this.placementHelper.position.x += 10 * overflowX
+                this.placementCoords.x -= overflowX
+            }
+
+            if (overflowZ > 0) {
+                this.placementHelper.position.z -= 10 * overflowZ
+                this.placementCoords.z += overflowZ
+            }
+            console.log("W:", w, "H:", h)
+            console.log("OX:", overflowX, "OZ:", overflowZ)
             console.log(this.placementCoords)
             // use e.keyCode
         })
 
-        //debug
-        this.x = 0.78
-        this.y = 1
-        this.z = 0.78
-
-        this.moveXUp = false
-        this.moveXDown = false
-        this.moveYUp = false
-        this.moveYDown = false
-        this.moveZUp = false
-        this.moveZDown = false
-
-        this.setPosition = false
-        this.nextDirection = false
-
-        let block = new Block(Blocks.blocks[0], this.player)
-        block.position.set(55, 0, 55)
+        let block = new Block(Blocks.blocks[9], this.player)
+        block.position.set(60, 0, 50)
         this.scene.add(block)
 
         this.placementHelper = block
-        this.placementCoords = {x: 0, z: 0, rot: 0}
+        this.placementCoords = { x: 0, z: 0, rot: 0 }
+        // koordynaty x i y od lewego gornego rogu planszy, ulozone jak axes. 
+        //Rot ma wartosc 0-3, gdzie zero to oryginalna, a za kazde +1 obraca sie o 90 w prawo
 
-        // document.addEventListener("keydown", (e) => {
-        //     this.moveXUp = false
-        //     this.moveXDown = false
-        //     this.moveYUp = false
-        //     this.moveYDown = false
-        //     this.moveZDown = false
-        //     this.moveZUp = false
-        //     switch (e.keyCode) {
-        //         case 39:
-        //         case 68:
-        //             this.moveXUp = true
-        //             this.moveZUp = true
-        //             break
-        //         case 37:
-        //         case 65:
-        //             this.moveXDown = true
-        //             this.moveZDown = true
-        //             break
-        //         case 38:
-        //         case 87:
-        //             this.moveYUp = true
-        //             break
-        //         case 40:
-        //         case 83:
-        //             this.moveYDown = true
-        //             break
-        //     }
-        //     if (this.setPosition) {
-        //         this.nextDirection = true
-        //     }
-        //     this.setPosition = true
-        // })
-
-        // document.addEventListener("keyup", (e) => {
-        //     switch (e.keyCode) {
-        //         case 39:
-        //         case 68:
-        //             this.moveXUp = false
-        //             this.moveZUp = false
-        //             break
-        //         case 37:
-        //         case 65:
-        //             this.moveXDown = false
-        //             this.moveZDown = false
-        //             break
-        //         case 38:
-        //         case 87:
-        //             this.moveYUp = false
-        //             break
-        //         case 40:
-        //         case 83:
-        //             this.moveYDown = false
-        //             break
-        //     }
-        //     if (!this.nextDirection) {
-        //         this.setPosition = false
-        //     }
-        // })
-
-        //this.pickedBlock = null;
         this.pickedBlock = null
         this.render()
     }
@@ -173,61 +121,14 @@ class Game {
         }
     }
 
-    // testcode
-    // createBlocks = () => {
-    //     console.log("block")
-    //     let block
-    //     Blocks.blocks.map((shape, i) => {
-    //         block = new Block(shape, this.player)
-    //         // block.position.set(160 + (i % 4) * 40, 100, 40 )
-    //         block.position.set(-300 + 30 * i, 0, 0)
-    //         block.fullRotate(false)
-    //         this.scene.add(block)
-    //         this.blocks.push(block)
-    //     })
-    // }
-
     setPlayerPosition = () => {
-        this.camera.position.set(0, 90, this.player == 2 ? 140 : -140)
+        this.camera.position.set(0, 120, this.player == 2 ? 180 : -180)
         this.camera.lookAt(this.scene.position)
     }
 
     render = () => {
         TWEEN.update()
         requestAnimationFrame(this.render)
-
-        // if (this.setPosition) {
-        //     if (this.moveXUp) {
-        //         this.x += 0.02
-        //     }
-        //     else if (this.moveXDown) {
-        //         this.x -= 0.02
-        //     }
-
-        //     if (this.moveYUp) {
-        //         if (this.y < 4) {
-        //             this.y += 0.03
-        //         }
-        //     }
-        //     else if (this.moveYDown) {
-        //         if (this.y > -4) {
-        //             this.y -= 0.03
-        //         }
-        //     }
-
-        //     if (this.moveZUp) {
-        //         this.z += 0.02
-        //     }
-        //     else if (this.moveZDown) {
-        //         this.z -= 0.02
-        //     }
-
-        //     this.camera.position.x = 282 * Math.sin(this.x)
-        //     this.camera.position.y = 200 * this.y
-        //     this.camera.position.z = 282 * Math.cos(this.z)
-        //     this.camera.lookAt(this.scene.position)
-        // }
-
         this.renderer.render(this.scene, this.camera)
     }
 }
