@@ -42,7 +42,7 @@ class Game {
         });
 
         window.addEventListener("keydown", (e) => {
-            console.log(e.keyCode)
+            //console.log(e.keyCode)
             let h = this.placementHelper.shape[1].length
             let w = this.placementHelper.shape.length
             // Movement Code
@@ -124,6 +124,10 @@ class Game {
     setPlayerPosition = () => {
         this.camera.position.set(0, 120, this.player == 2 ? 180 : -180)
         this.camera.lookAt(this.scene.position)
+    }
+
+    blockButtonClick = (shape) => {
+        console.log(shape)
     }
 
     render = () => {

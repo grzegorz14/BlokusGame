@@ -8,6 +8,8 @@ class Net {
 
         this.login = ""
 
+        this.audio = new Audio('./sounds/bad-piggies-drip.mp3')
+
         document.getElementById("playButton").onclick = this.play
         document.getElementById("resetButton").onclick = this.reset
     }
@@ -28,8 +30,8 @@ class Net {
                 console.log("Login: " + login)
 
                 this.login = login
-                //this.game.player = data.player
-                //this.game.opponent = data.player == 1 ? 2 : 1
+                this.game.player = data.player
+                this.game.opponent = data.player == 1 ? 2 : 1
 
                 data.player == 2 ? this.waitForOpponent() : this.preparePlayer()
             }
@@ -70,22 +72,25 @@ class Net {
         this.ui.hide(this.ui.logingDialog)
         this.ui.hide(this.ui.dialog)
         this.ui.removeMist()
-        //set your login somewhere in ui
 
-        if (this.game.player == 2) {
-            this.startTimer()
-            //this.game.yourTurn = false;
-        }
-        else {
-            //this.game.yourTurn = true;
-        }
+        //uncomment to start timer at the begging 
+        // if (this.game.player == 2) { 
+        //     this.startTimer()
+        //     //this.game.yourTurn = false;
+        // }
+        // else {
+        //     //this.game.yourTurn = true;
+        // }
 
         this.game.createBoard()
         //this.game.createBlocks() <- Debug Code
-        this.ui.addBlocks()
+        this.ui.addBlocks(this.game.player, this.game.blockButtonClick, this.finishButtonClick, this.login)
+        this.ui.show(this.ui.moveBox)
         this.ui.show(this.ui.yourBlocks)
         this.ui.show(this.ui.opponentsBlocks)
         this.game.setPlayerPosition()
+
+        this.audio.play()
 
         this.updateInterval = setInterval(this.update, 200)
     }
@@ -122,7 +127,14 @@ class Net {
         }, 1000)
     }
 
+    finishButtonClick = (player) => {
+        if (!confirm("Are you sure? You won't take anymore turns.")) return
+
+        console.log("Finish click, player " + player)
+    }
+
     gameEnd = (message) => {
+        this.ui.hide(this.ui.moveBox)
         this.ui.hide(this.ui.yourBlocks)
         this.ui.hide(this.ui.opponentsBlocks)
         this.ui.hide(this.ui.dialog)
@@ -131,6 +143,8 @@ class Net {
 
         this.ui.dialog.innerText = message
         this.ui.show(this.ui.dialog)
+
+        this.audio.pause()
     }
 }
 
