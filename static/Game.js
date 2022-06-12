@@ -35,68 +35,79 @@ class Game {
             if (intersects.length > 0) {
                 object = intersects[0].object
                 if (object instanceof Tile) {
-                    console.log("made Block")
 
                 }
             }
         });
 
         window.addEventListener("keydown", (e) => {
-            //console.log(e.keyCode)
-            let h = this.placementHelper.shape[1].length
-            let w = this.placementHelper.shape.length
-            // Movement Code
-            if (e.keyCode == 81) {
-                // Rotate Helper Left
-                this.placementCoords.z += this.placementHelper.fullRotate(true)
-                this.placementCoords.rot += 1
-                this.placementCoords.rot = this.placementCoords.rot % 4
-            } else if (e.keyCode == 69) {
-                // Rotate Helper Right
-                this.placementCoords.z += this.placementHelper.fullRotate(false)
-                this.placementCoords.rot -= 1
-                this.placementCoords.rot = this.placementCoords.rot % 4
+            if (this.placementHelper) {
+                let w = this.placementHelper.w
+                let h = this.placementHelper.h
+                // Movement Code
+                if (e.keyCode == 81) {
+                    // Rotate Helper Left
+                    this.placementCoords.rot += 1
+                    this.placementCoords.rot = this.placementCoords.rot % 4
+
+                    this.placementHelper.fullRotate(true)
+
+
+                } else if (e.keyCode == 69) {
+                    // Rotate Helper Right
+                    this.placementCoords.rot -= 1
+                    this.placementCoords.rot = this.placementCoords.rot % 4
+
+                    this.placementHelper.fullRotate(false)
+                }
+
+                if (e.keyCode == 87 && this.placementCoords.z > 0) {
+                    // Move helper up
+                    this.placementHelper.position.z += 10
+                    this.placementCoords.z -= 1
+                } else if (e.keyCode == 83 && this.placementCoords.z < (14 - ((this.placementHelper.rotationID % 2 == 0) ? h : w))) {
+                    // Move helper down
+                    this.placementHelper.position.z -= 10
+                    this.placementCoords.z += 1
+                }
+
+                if (e.keyCode == 65 && this.placementCoords.x > 0) {
+                    // Move helper left
+                    this.placementHelper.position.x += 10
+                    this.placementCoords.x -= 1
+                } else if (e.keyCode == 68 && this.placementCoords.x < (14 - ((this.placementHelper.rotationID % 2 == 0) ? w : h))) {
+                    // Move helper right
+                    this.placementHelper.position.x -= 10
+                    this.placementCoords.x += 1
+                }
+
+                let overflowX = this.placementCoords.x + ((this.placementHelper.rotationID % 2 == 0) ? w : h) - 14
+                let overflowZ = this.placementCoords.z + ((this.placementHelper.rotationID % 2 == 0) ? h : w) - 14
+                if (overflowX > 0) {
+                    this.placementHelper.position.x += 10 * overflowX
+                    this.placementCoords.x -= overflowX
+                }
+
+                if (overflowZ > 0) {
+                    this.placementHelper.position.z += 10 * overflowZ
+                    this.placementCoords.z -= overflowZ
+                }
+
+                console.log(this.placementCoords.x, this.placementCoords.z, overflowX, overflowZ)
             }
 
-            if (e.keyCode == 87 && this.placementCoords.z > 0) {
-                // Move helper up
-                this.placementHelper.position.z += 10
-                this.placementCoords.z -= 1
-            } else if (e.keyCode == 83 && this.placementCoords.z < (14 - ((this.placementHelper.rotationID % 2 == 0) ? h : w))) {
-                // Move helper down
-                this.placementHelper.position.z -= 10
-                this.placementCoords.z += 1
-            }
-
-            if (e.keyCode == 65 && this.placementCoords.x > 0) {
-                // Move helper left
-                this.placementHelper.position.x += 10
-                this.placementCoords.x -= 1
-            } else if (e.keyCode == 68 && this.placementCoords.x < (14 - ((this.placementHelper.rotationID % 2 == 0) ? w : h))) {
-                // Move helper right
-                this.placementHelper.position.x -= 10
-                this.placementCoords.x += 1
-            }
-
-            let overflowX = this.placementCoords.x + ((this.placementHelper.rotationID % 2 == 0) ? w : h) - 14
-            let overflowZ = -this.placementCoords.z
-            if (overflowX > 0) {
-                this.placementHelper.position.x += 10 * overflowX
-                this.placementCoords.x -= overflowX
-            }
-
-            if (overflowZ > 0) {
-                this.placementHelper.position.z -= 10 * overflowZ
-                this.placementCoords.z += overflowZ
-            }
-            console.log("W:", w, "H:", h)
-            console.log("OX:", overflowX, "OZ:", overflowZ)
-            console.log(this.placementCoords)
             // use e.keyCode
+
+            // debug block selection
+            if (e.keyCode == 49) this.selectBlock(2)
+            if (e.keyCode == 50) this.selectBlock(4)
+            if (e.keyCode == 51) this.selectBlock(7)
+            if (e.keyCode == 52) this.selectBlock(11)
+            if (e.keyCode == 53) this.selectBlock(15)
         })
 
-        let block = new Block(Blocks.blocks[9], this.player)
-        block.position.set(60, 0, 50)
+        let block = new Block(Blocks.blocks[11], this.player)
+        block.position.set(70, 0, 70)
         this.scene.add(block)
 
         this.placementHelper = block
@@ -104,8 +115,37 @@ class Game {
         // koordynaty x i y od lewego gornego rogu planszy, ulozone jak axes. 
         //Rot ma wartosc 0-3, gdzie zero to oryginalna, a za kazde +1 obraca sie o 90 w prawo
 
-        this.pickedBlock = null
+        this.pickedBlock = block
+
+        // <DEBUG>
+        const axesHelper = new THREE.AxesHelper(100);
+        this.scene.add(axesHelper);
+        // </DEBUG>
+
         this.render()
+    }
+
+    selectBlock = (id) => {
+        let rot = this.placementHelper.rotationID
+
+        if (this.placementHelper) {
+            this.placementHelper.safeDelete(this.scene)
+        }
+
+        let block = new Block(Blocks.blocks[id], this.player)
+        this.scene.add(block)
+
+        this.placementHelper = block
+
+        this.placementHelper.setRotation(rot)
+
+        this.placementHelper.position.set(
+            60 - this.placementCoords.x * 10,
+            0,
+            60 - this.placementCoords.z * 10
+        )
+
+        console.log(`Added block with id ${id}`)
     }
 
     createBoard = () => {
