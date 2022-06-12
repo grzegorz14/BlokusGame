@@ -9,13 +9,11 @@ class Ui {
         this.isOnLeft = true
         this.moveBox = document.getElementById("moveBox")
         this.moveBox.addEventListener("click", () => {
-            if (this.isOnLeft)
-            {
+            if (this.isOnLeft) {
                 this.moveBox.classList.remove("buttonLeft")
                 this.moveBox.classList.add("buttonRight")
             }
-            else
-            {
+            else {
                 this.moveBox.classList.remove("buttonRight")
                 this.moveBox.classList.add("buttonLeft")
             }
@@ -60,34 +58,34 @@ class Ui {
         //your blocks
         Blocks.blocks.map((block, i) => {
             const button = document.createElement("button")
-            button.addEventListener("click", () => clickEvent(block))
+            button.addEventListener("click", () => clickEvent(i))
             button.classList.add("block")
             button.classList.add("blockButton")
             for (let i = 0; i < block.length; i++) {
                 for (let j = 0; j < block[i].length; j++) {
-                    button.innerHTML += block[i][j] == 1 ? (player == 1 ?  "🟩" : "🟦") : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                    button.innerHTML += block[i][j] == 1 ? (player == 1 ? "🟩" : "🟦") : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
                 }
                 button.innerHTML += "<br/>"
             }
             this.yourBlocks.appendChild(button)
         })
-        
+
         //opponent's blocks
-        Blocks.blocks.map((block, i) => { 
+        Blocks.blocks.map((block, i) => {
             const button = document.createElement("button")
             button.classList.add("block")
             button.disabled = true
             for (let i = 0; i < block.length; i++) {
                 for (let j = 0; j < block[i].length; j++) {
-                    button.innerHTML += block[i][j] == 1 ? (player == 1 ?  "🟦" : "🟩") : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                    button.innerHTML += block[i][j] == 1 ? (player == 1 ? "🟦" : "🟩") : "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
                 }
                 button.innerHTML += "<br/>"
             }
             this.opponentsBlocks.appendChild(button)
         })
 
-        this.yourBlocks.style.backgroundColor = player == 1 ?  "#285D34" : "#0B0B60";
-        this.opponentsBlocks.style.backgroundColor = player == 1 ?  "#0B0B60" : "#285D34";
+        this.yourBlocks.style.backgroundColor = player == 1 ? "#285D34" : "#0B0B60";
+        this.opponentsBlocks.style.backgroundColor = player == 1 ? "#0B0B60" : "#285D34";
 
         const finishButton = document.createElement("button")
         finishButton.classList.add("block")

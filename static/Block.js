@@ -2,7 +2,7 @@ import Segment from "./Segment.js"
 
 // zmienilem block na nie-zjebany
 class Block extends THREE.Group {
-    constructor(shape, player) {
+    constructor(shape, player, isHelper) {
         super()
         this.shape = shape
         this.player = player
@@ -22,7 +22,7 @@ class Block extends THREE.Group {
         for (let i = 0; i < this.shape.length; i++) {
             for (let j = 0; j < this.shape[i].length; j++) {
                 if (this.shape[i][j] == 1) {
-                    let segment = new Segment()
+                    let segment = new Segment(this.isHelper)
                     segment.position.set(-5 - 10 * i, 0, -10 * j - 5)
                     this.add(segment)
                 }

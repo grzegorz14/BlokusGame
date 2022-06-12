@@ -24,6 +24,17 @@ class Game {
         this.blocks = { player: Block.blocks, opponent: Block.blocks }
         this.tiles = []
 
+        this.pickedBlock = null
+        this.placementHelper = null
+        this.placementCoords = { x: 0, z: 0, rot: 0 }
+        // koordynaty x i y od lewego gornego rogu planszy, ulozone jak axes. 
+        //Rot ma wartosc 0-3, gdzie zero to oryginalna, a za kazde +1 obraca sie o 90 w prawo
+
+        // <DEBUG>
+        const axesHelper = new THREE.AxesHelper(100);
+        this.scene.add(axesHelper);
+        // </DEBUG>
+
         // onClick on object
         let object = null
         window.addEventListener("mousedown", async (e) => {
@@ -81,6 +92,7 @@ class Game {
                     this.placementCoords.x += 1
                 }
 
+                // Prevent Clipping out of board
                 let overflowX = this.placementCoords.x + ((this.placementHelper.rotationID % 2 == 0) ? w : h) - 14
                 let overflowZ = this.placementCoords.z + ((this.placementHelper.rotationID % 2 == 0) ? h : w) - 14
                 if (overflowX > 0) {
@@ -95,55 +107,59 @@ class Game {
 
                 console.log(this.placementCoords.x, this.placementCoords.z, overflowX, overflowZ)
             }
-
-            // use e.keyCode
-
-            // debug block selection
-            if (e.keyCode == 49) this.selectBlock(2)
-            if (e.keyCode == 50) this.selectBlock(4)
-            if (e.keyCode == 51) this.selectBlock(7)
-            if (e.keyCode == 52) this.selectBlock(11)
-            if (e.keyCode == 53) this.selectBlock(15)
         })
-
-        let block = new Block(Blocks.blocks[11], this.player)
-        block.position.set(70, 0, 70)
-        this.scene.add(block)
-
-        this.placementHelper = block
-        this.placementCoords = { x: 0, z: 0, rot: 0 }
-        // koordynaty x i y od lewego gornego rogu planszy, ulozone jak axes. 
-        //Rot ma wartosc 0-3, gdzie zero to oryginalna, a za kazde +1 obraca sie o 90 w prawo
-
-        this.pickedBlock = block
-
-        // <DEBUG>
-        const axesHelper = new THREE.AxesHelper(100);
-        this.scene.add(axesHelper);
-        // </DEBUG>
 
         this.render()
     }
 
     selectBlock = (id) => {
-        let rot = this.placementHelper.rotationID
-
+        // safely delete old block
         if (this.placementHelper) {
             this.placementHelper.safeDelete(this.scene)
         }
 
-        let block = new Block(Blocks.blocks[id], this.player)
+        // make new block
+        let block = new Block(Blocks.blocks[id], this.player, true)
         this.scene.add(block)
 
-        this.placementHelper = block
+        // replace old helper
+        if (this.placementHelper) {
+            let rot = this.placementHelper.rotationID
+            let x = this.placementHelper.position.x
+            let z = this.placementHelper.position.z
 
-        this.placementHelper.setRotation(rot)
+            this.placementHelper = block
 
-        this.placementHelper.position.set(
-            60 - this.placementCoords.x * 10,
-            0,
-            60 - this.placementCoords.z * 10
-        )
+            // position in default rotation on current position
+            this.placementHelper.position.set(
+                70 - this.placementCoords.x * 10,
+                0,
+                70 - this.placementCoords.z * 10
+            )
+
+            // restore rotation
+            this.placementHelper.setRotation(rot)
+
+            // Prevent Clipping out of board
+            let overflowX = this.placementCoords.x + ((this.placementHelper.rotationID % 2 == 0) ? w : h) - 14
+            let overflowZ = this.placementCoords.z + ((this.placementHelper.rotationID % 2 == 0) ? h : w) - 14
+            if (overflowX > 0) {
+                this.placementHelper.position.x += 10 * overflowX
+                this.placementCoords.x -= overflowX
+            }
+
+            if (overflowZ > 0) {
+                this.placementHelper.position.z += 10 * overflowZ
+                this.placementCoords.z -= overflowZ
+            }
+        }
+        // make new helper
+        else {
+            this.placementHelper = block
+
+            // position in default rotation on current position
+            this.placementHelper.position.set(70, 0, 70)
+        }
 
         console.log(`Added block with id ${id}`)
     }
@@ -166,9 +182,7 @@ class Game {
         this.camera.lookAt(this.scene.position)
     }
 
-    blockButtonClick = (shape) => {
-        console.log(shape)
-    }
+    blockButtonClick = (id) => this.selectBlock(id)
 
     render = () => {
         TWEEN.update()
