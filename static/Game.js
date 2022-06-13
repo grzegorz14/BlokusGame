@@ -126,11 +126,13 @@ class Game {
         // TODO: Validation
         this.validatePlacement()
 
+        let pointsCounter = 0 
         let w = this.placementHelper.w
         let h = this.placementHelper.h
         for (let i = 0; i < w; i++) {
             for (let j = 0; j < h; j++) {
                 if (this.placementHelper.shape[i][j] == 1) {
+                    pointsCounter += 1
                     this.board[this.placementCoords.z + j][this.placementCoords.x + i] = this.placementHelper.shape[i][j]
                 }
             }
@@ -138,6 +140,7 @@ class Game {
 
         //removes block button from ui
         document.getElementById("your" + this.pickedBlockId).remove() 
+        document.getElementById("yourPoints").innerText = parseInt(document.getElementById("yourPoints").innerText) + pointsCounter
 
         this.moved = true
 

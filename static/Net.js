@@ -23,6 +23,8 @@ class Net {
             return
         }
 
+        this.lastBlockId = -1
+
         const body = JSON.stringify({ login })
         const headers = { "Content-Type": "application/json" }
         let response = await fetch("/addPlayer", { method: "post", body, headers })
@@ -54,7 +56,6 @@ class Net {
     }
 
     waitForOpponent = () => {
-        //set your login somewhere in ui
         this.ui.hide(this.ui.logingDialog)
         this.ui.show(this.ui.dialog)
         this.ui.dialog.innerText = "Waiting for an opponent..."
@@ -101,20 +102,14 @@ class Net {
             let response = await fetch("/getBlock", { method: "post" })
 
             await response.json().then(async data => { 
-                if (data.win == this.game.player) { //you win by timer
-                    console.log("WIN")
-                    clearInterval(this.updateInterval)
-                    clearInterval(this.timerInterval)
-                    this.win()
-                }
-                else if (data.win == this.game.opponent) { //opponent wins by timer
+                if (data.win == this.game.opponent) { //opponent wins by timer
                     console.log("LOSE")
                     clearInterval(this.updateInterval)
-                    this.lose()
+                    this.gameEnd("YOU LOSE!")
+                    await fetch("/resetRequest", { method: "post" })
                 }
                 else if (this.lastBlockId != data.blockId && data.blockId > -1) { //opponent moves
                     await this.placeBlock(data.blockId, data.coords)
-                    console.log("here")
                     clearInterval(this.timerInterval)
                     this.ui.removeMist()
                     this.ui.hide(this.ui.dialog)
@@ -137,18 +132,24 @@ class Net {
         this.ui.addMist()
         this.ui.show(this.ui.dialog)
         this.ui.show(this.ui.counter)
-        let secondsLeft = 60
+        let secondsLeft = 10
         this.ui.counter.innerText = secondsLeft
         secondsLeft -= 1
 
         this.timerInterval = setInterval(async () => {
             if (secondsLeft == 0) {
                 clearInterval(this.timerInterval)
+                clearInterval(this.updateInterval)
 
-                //declare win
-                // const body = JSON.stringify({ player: this.game.player })
-                // const headers = { "Content-Type": "application/json" }
-                // await fetch("/win", { method: "post", headers, body })
+                console.log("WIN")
+
+                //declare win by timer
+                const body = JSON.stringify({ player: this.game.player })
+                const headers = { "Content-Type": "application/json" }
+                await fetch("/win", { method: "post", headers, body })
+
+                this.gameEnd("YOU WIN!")
+                await fetch("/resetRequest", { method: "post" })
             }
             else {
                 this.ui.counter.textContent = secondsLeft
@@ -158,8 +159,7 @@ class Net {
     }
 
     placeBlock = async (id, coords) => {
-        console.log("Placing block")
-        console.log(id)
+        console.log("Placing block " + id)
         this.lastBlockId = id
     }
 
@@ -172,6 +172,7 @@ class Net {
     }
 
     gameEnd = (message) => {
+        console.log("game end")
         this.ui.hide(this.ui.moveBox)
         this.ui.hide(this.ui.yourBlocks)
         this.ui.hide(this.ui.opponentsBlocks)

@@ -1,7 +1,7 @@
 const express = require("express")
 const app = express()
 const path = require("path")
-var PORT = process.env.PORT || 3000; 
+var PORT = process.env.PORT || 3000
 
 app.use(express.json())
 app.use(express.static("static"))
@@ -31,7 +31,11 @@ var coords = null
 var blockId = -1
 
 var players = []
+var points1 = 0
+var points2 = 0
 var finished = 0
+var win = null
+var reset = 0
 
 app.post("/addPlayer", (req, res) => {
     let login = req.body.login
@@ -48,6 +52,7 @@ app.post("/addPlayer", (req, res) => {
             }
             break
         case 0:
+            resetGame()
             players.push(login)
             res.json({ success: true, player: 2 })
             break
@@ -64,21 +69,50 @@ app.post("/waitingForOpponent", (req, res) => {
 app.post("/placeBlock", (req, res) => {
     blockId = req.body.blockId
     coords = req.body.coords
+    res.json({ success: true })
 })
 
 app.post("/getBlock", (req, res) => {
-    res.json({ blockId, coords })
+    res.json({ blockId, coords, win })
     blockId = -1
 })
 
+app.post("/finishGame", (req, res) => {
+    finished += 1
+    if (finished == 2) {
+        win = points1 > points2 ? 1 : 2
+    }   
+    res.json({ success: true })
+})
+
+app.post("/win", (req, res) => {
+    win = req.body.player
+    res.json({ success: true })
+})
+
+app.post("/resetRequest", (req, res) => {
+    (reset += 1) == 2 && resetGame()
+    res.json({ success: true })
+})
+
+
 app.post("/reset", (req, res) => {
-    players = []
-    finished = 0
-    boardState = clearBoard
-    console.log("New game")
+    resetGame()
     res.json({ success: true })
 })
 
 app.listen(PORT, function () {
     console.log("App is running on port " + PORT)
 })
+
+function resetGame() {
+    reset = 0
+    blockId = -1
+    players = []
+    finished = 0
+    win = null
+    points1 = 0
+    points2 = 0
+    boardState = clearBoard
+    console.log("New game")
+}

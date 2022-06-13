@@ -44,6 +44,18 @@ class Ui {
         opponentLogin.innerText = "Opponent"
         this.opponentsBlocks.appendChild(opponentLogin)
 
+        const yourPoints = document.createElement("p")
+        yourPoints.classList.add("points")
+        yourPoints.id = "yourPoints"
+        yourPoints.textContent = "0"
+        this.yourBlocks.appendChild(yourPoints)
+
+        const opponentPoints = document.createElement("p")
+        opponentPoints.classList.add("points")
+        opponentPoints.id = "opponentPoints"
+        opponentPoints.textContent = "0"
+        this.opponentsBlocks.appendChild(opponentPoints)
+
         //your blocks
         Blocks.blocks.map((block, i) => {
             const button = document.createElement("button")
