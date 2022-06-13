@@ -8,17 +8,6 @@ class Ui {
         this.logingDialog = document.getElementById("logingDialog")
         this.isOnLeft = true
         this.moveBox = document.getElementById("moveBox")
-        this.moveBox.addEventListener("click", () => {
-            if (this.isOnLeft) {
-                this.moveBox.classList.remove("buttonLeft")
-                this.moveBox.classList.add("buttonRight")
-            }
-            else {
-                this.moveBox.classList.remove("buttonRight")
-                this.moveBox.classList.add("buttonLeft")
-            }
-            this.isOnLeft = !this.isOnLeft
-        })
         this.yourBlocks = document.getElementById("yourBlocks")
         this.opponentsBlocks = document.getElementById("opponentsBlocks")
         this.dialog = document.getElementById("dialog")
@@ -59,6 +48,7 @@ class Ui {
         Blocks.blocks.map((block, i) => {
             const button = document.createElement("button")
             button.addEventListener("click", () => clickEvent(i))
+            button.id = "your" + i
             button.classList.add("block")
             button.classList.add("blockButton")
             for (let i = 0; i < block.length; i++) {
@@ -73,6 +63,7 @@ class Ui {
         //opponent's blocks
         Blocks.blocks.map((block, i) => {
             const button = document.createElement("button")
+            button.id = "opponent" + i
             button.classList.add("block")
             button.disabled = true
             for (let i = 0; i < block.length; i++) {
@@ -93,6 +84,24 @@ class Ui {
         finishButton.textContent = "Finish game"
         finishButton.addEventListener("click", () => finishEvent(player))
         this.yourBlocks.appendChild(finishButton)
+    }
+
+    deleteBlock = (index) => {
+        document.getElementById("your" + index).remove( )
+    }
+
+    moveTurnTile = () => {
+        if (this.isOnLeft) {
+            this.moveBox.classList.remove("buttonLeft")
+            this.moveBox.classList.add("buttonRight")
+            this.moveBox.innerText = "Opponent's turn"
+        }
+        else {
+            this.moveBox.classList.remove("buttonRight")
+            this.moveBox.classList.add("buttonLeft")
+            this.moveBox.innerText = "Your turn"
+        }
+        this.isOnLeft = !this.isOnLeft
     }
 }
 

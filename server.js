@@ -27,12 +27,14 @@ const clearBoard = [ // 0 - empty, 1 - player 1 segment, 2 - player 2 segment
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 ]
 
-var boardState = clearBoard
+var coords = null
+var blockId = -1
+
 var players = []
-var login
+var finished = 0
 
 app.post("/addPlayer", (req, res) => {
-    login = req.body.login
+    let login = req.body.login
     console.log("Adding player: " + login)
 
     switch (players.length) {
@@ -59,8 +61,19 @@ app.post("/waitingForOpponent", (req, res) => {
     res.json({ success: players.length == 2 })
 })
 
+app.post("/placeBlock", (req, res) => {
+    blockId = req.body.blockId
+    coords = req.body.coords
+})
+
+app.post("/getBlock", (req, res) => {
+    res.json({ blockId, coords })
+    blockId = -1
+})
+
 app.post("/reset", (req, res) => {
     players = []
+    finished = 0
     boardState = clearBoard
     console.log("New game")
     res.json({ success: true })

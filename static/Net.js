@@ -8,6 +8,8 @@ class Net {
 
         this.login = ""
 
+        this.lastBlockId = -1
+
         this.audio = new Audio('./sounds/bad-piggies-drip.mp3')
 
         document.getElementById("playButton").onclick = this.play
@@ -73,17 +75,16 @@ class Net {
         this.ui.hide(this.ui.dialog)
         this.ui.removeMist()
 
-        //uncomment to start timer at the begging 
-        // if (this.game.player == 2) { 
-        //     this.startTimer()
-        //     //this.game.yourTurn = false;
-        // }
-        // else {
-        //     //this.game.yourTurn = true;
-        // }
+        if (this.game.player == 2) { 
+            this.ui.moveTurnTile()
+            this.startTimer()
+            this.game.yourTurn = false
+        }
+        else {
+            this.game.yourTurn = true
+        }
 
         this.game.createBoard()
-        //this.game.createBlocks() <- Debug Code
         this.ui.addBlocks(this.game.player, this.game.blockButtonClick, this.finishButtonClick, this.login)
         this.ui.show(this.ui.moveBox)
         this.ui.show(this.ui.yourBlocks)
@@ -96,18 +97,47 @@ class Net {
     }
 
     update = async () => {
-        // let response = await fetch("/somePost", { method: "post" }) //get last move
+        if (!this.game.yourTurn && !this.game.moved) {
+            let response = await fetch("/getBlock", { method: "post" })
 
-        // await response.json().then(async data => {
-        //     console.log(data)
-        // })
+            await response.json().then(async data => { 
+                if (data.win == this.game.player) { //you win by timer
+                    console.log("WIN")
+                    clearInterval(this.updateInterval)
+                    clearInterval(this.timerInterval)
+                    this.win()
+                }
+                else if (data.win == this.game.opponent) { //opponent wins by timer
+                    console.log("LOSE")
+                    clearInterval(this.updateInterval)
+                    this.lose()
+                }
+                else if (this.lastBlockId != data.blockId && data.blockId > -1) { //opponent moves
+                    await this.placeBlock(data.blockId, data.coords)
+    
+                    clearInterval(this.timerInterval)
+                    this.ui.removeMist()
+                    this.ui.hide(this.ui.dialog)
+                    this.ui.hide(this.ui.counter)
+                    this.ui.moveTurnTile()
+    
+                    this.game.yourTurn = true
+                }
+            })
+        }
+        else if (this.game.moved) {
+            this.game.yourTurn = false
+            this.game.moved = false
+            this.ui.moveTurnTile()
+            this.startTimer()
+        }
     }
 
     startTimer = () => {
         this.ui.addMist()
         this.ui.show(this.ui.dialog)
         this.ui.show(this.ui.counter)
-        let secondsLeft = 30
+        let secondsLeft = 60
         this.ui.counter.innerText = secondsLeft
         secondsLeft -= 1
 
@@ -127,10 +157,18 @@ class Net {
         }, 1000)
     }
 
+    placeBlock = async (id, coords) => {
+        console.log("Placing block")
+        console.log(id)
+        this.lastBlockId = id
+    }
+
     finishButtonClick = (player) => {
         if (!confirm("Are you sure? You won't take anymore turns.")) return
 
         console.log("Finish click, player " + player)
+
+        //fetch server here
     }
 
     gameEnd = (message) => {

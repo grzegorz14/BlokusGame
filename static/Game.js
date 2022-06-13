@@ -21,10 +21,14 @@ class Game {
         this.player = null
         this.opponent = null
 
+        this.moved = false
+        this.yourTurn = false
+
         this.blocks = { player: Block.blocks, opponent: Block.blocks }
         this.tiles = []
         this.board = []
 
+        this.pickedBlockId = -1
         this.pickedBlock = null
         this.placementHelper = null
         this.placementCoords = { x: 0, z: 0, rot: 0 }
@@ -32,8 +36,8 @@ class Game {
         //Rot ma wartosc 0-3, gdzie zero to oryginalna, a za kazde +1 obraca sie o 90 w prawo
 
         // <DEBUG>
-        const axesHelper = new THREE.AxesHelper(100);
-        this.scene.add(axesHelper);
+        const axesHelper = new THREE.AxesHelper(100)
+        this.scene.add(axesHelper)
         // </DEBUG>
 
         // onClick on object
@@ -117,7 +121,7 @@ class Game {
         this.render()
     }
 
-    placeBlock = () => {
+    placeBlock = async () => {
         // Place Block
         // TODO: Validation
         this.validatePlacement()
@@ -131,6 +135,15 @@ class Game {
                 }
             }
         }
+
+        this.moved = true
+
+        const headers = { "Content-Type": "application/json" }
+        let body = JSON.stringify({
+            blockId: this.pickedBlockId,
+            coords: this.placementCoords
+        })
+        await fetch("/placeBlock", { method: "post", headers, body })
     }
 
     validatePlacement = () => {
@@ -184,6 +197,11 @@ class Game {
     }
 
     selectBlock = (id) => {
+        //check if it's your turn
+        if (!this.yourTurn) return
+
+        this.pickedBlockId = id
+
         // safely delete old block
         if (this.placementHelper) {
             this.placementHelper.safeDelete(this.scene)
