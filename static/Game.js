@@ -147,7 +147,9 @@ class Game {
         const headers = { "Content-Type": "application/json" }
         let body = JSON.stringify({
             blockId: this.pickedBlockId,
-            coords: this.placementCoords
+            coords: this.placementCoords,
+            points: pointsCounter,
+            player: this.player
         })
         await fetch("/placeBlock", { method: "post", headers, body })
     }

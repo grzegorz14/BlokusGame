@@ -115,7 +115,9 @@ class Net {
                     this.ui.hide(this.ui.dialog)
                     this.ui.hide(this.ui.counter)
                     this.ui.moveTurnTile()
-    
+
+                    document.getElementById("opponentPoints").innerText = this.game.opponent == 1 ? data.points1 : data.points2
+
                     this.game.yourTurn = true
                 }
             })
@@ -132,7 +134,7 @@ class Net {
         this.ui.addMist()
         this.ui.show(this.ui.dialog)
         this.ui.show(this.ui.counter)
-        let secondsLeft = 10
+        let secondsLeft = 60
         this.ui.counter.innerText = secondsLeft
         secondsLeft -= 1
 

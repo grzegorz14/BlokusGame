@@ -69,11 +69,13 @@ app.post("/waitingForOpponent", (req, res) => {
 app.post("/placeBlock", (req, res) => {
     blockId = req.body.blockId
     coords = req.body.coords
+    if (req.body.player == 1) points1 += req.body.points
+    else points2 += req.body.points
     res.json({ success: true })
 })
 
 app.post("/getBlock", (req, res) => {
-    res.json({ blockId, coords, win })
+    res.json({ blockId, coords, win, points1, points2 })
     blockId = -1
 })
 
