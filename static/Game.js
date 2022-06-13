@@ -99,7 +99,7 @@ class Game {
                 }
 
                 if (e.keyCode == 32) {
-                    this.placeBlock()
+                    this.yourTurn && this.placeBlock()
                 }
 
                 // Prevent Clipping out of board
@@ -135,6 +135,9 @@ class Game {
                 }
             }
         }
+
+        //removes block button from ui
+        document.getElementById("your" + this.pickedBlockId).remove() 
 
         this.moved = true
 

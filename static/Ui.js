@@ -86,10 +86,6 @@ class Ui {
         this.yourBlocks.appendChild(finishButton)
     }
 
-    deleteBlock = (index) => {
-        document.getElementById("your" + index).remove( )
-    }
-
     moveTurnTile = () => {
         if (this.isOnLeft) {
             this.moveBox.classList.remove("buttonLeft")

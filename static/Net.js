@@ -114,7 +114,7 @@ class Net {
                 }
                 else if (this.lastBlockId != data.blockId && data.blockId > -1) { //opponent moves
                     await this.placeBlock(data.blockId, data.coords)
-    
+                    console.log("here")
                     clearInterval(this.timerInterval)
                     this.ui.removeMist()
                     this.ui.hide(this.ui.dialog)
@@ -126,10 +126,10 @@ class Net {
             })
         }
         else if (this.game.moved) {
-            this.game.yourTurn = false
-            this.game.moved = false
             this.ui.moveTurnTile()
             this.startTimer()
+            this.game.yourTurn = false
+            this.game.moved = false
         }
     }
 
