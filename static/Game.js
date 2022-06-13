@@ -23,6 +23,7 @@ class Game {
 
         this.blocks = { player: Block.blocks, opponent: Block.blocks }
         this.tiles = []
+        this.board = []
 
         this.pickedBlock = null
         this.placementHelper = null
@@ -53,6 +54,7 @@ class Game {
 
         window.addEventListener("keydown", (e) => {
             if (this.placementHelper) {
+                console.log(e.keyCode)
                 let w = this.placementHelper.w
                 let h = this.placementHelper.h
                 // Movement Code
@@ -92,6 +94,20 @@ class Game {
                     this.placementCoords.x += 1
                 }
 
+                if (e.keyCode == 32) {
+                    // Place Block
+                    // TODO: Validation
+                    let xLim = this.placementHelper.rotationID % 2 == 0 ? w : h
+                    let zLim = this.placementHelper.rotationID % 2 == 0 ? h : w
+                    for (let i = 0; i < xLim; i++) {
+                        for (let j = 0; j < zLim; j++) {
+                            console.log(this.placementCoords.x, i, this.placementCoords.z, j)
+                            this.board[this.placementCoords.x + i][this.placementCoords.z + j] = this.placementHelper.shape[i][j]
+                        }
+                    }
+                    console.log(this.board)
+                }
+
                 // Prevent Clipping out of board
                 let overflowX = this.placementCoords.x + ((this.placementHelper.rotationID % 2 == 0) ? w : h) - 14
                 let overflowZ = this.placementCoords.z + ((this.placementHelper.rotationID % 2 == 0) ? h : w) - 14
@@ -105,7 +121,6 @@ class Game {
                     this.placementCoords.z -= overflowZ
                 }
 
-                console.log(this.placementCoords.x, this.placementCoords.z, overflowX, overflowZ)
             }
         })
 
@@ -127,6 +142,8 @@ class Game {
             let rot = this.placementHelper.rotationID
             let x = this.placementHelper.position.x
             let z = this.placementHelper.position.z
+            let w = this.placementHelper.w
+            let h = this.placementHelper.h
 
             this.placementHelper = block
 
@@ -160,21 +177,23 @@ class Game {
             // position in default rotation on current position
             this.placementHelper.position.set(70, 0, 70)
         }
-
-        console.log(`Added block with id ${id}`)
     }
 
     createBoard = () => {
         let tile
         for (let i = 0; i < 14; i++) {
+            let row = []
             for (let j = 0; j < 14; j++) {
                 tile = new Tile(i, j)
                 // jak chcesz dalej plansze, to oddal kamere
                 tile.position.set(65 - j * 10, -4, 65 - i * 10)
                 this.tiles.push(tile)
                 this.scene.add(tile)
+                row.push(0)
             }
+            this.board.push(row)
         }
+        console.log(this.board)
     }
 
     setPlayerPosition = () => {

@@ -23,7 +23,7 @@ class Block extends THREE.Group {
             for (let j = 0; j < this.shape[i].length; j++) {
                 if (this.shape[i][j] == 1) {
                     let segment = new Segment(this.isHelper)
-                    segment.position.set(-5 - 10 * i, 0, -10 * j - 5)
+                    segment.position.set(-10 * this.shape[i].length + 10 * j + 5, 0, -10 * i - 5)
                     this.add(segment)
                 }
             }
@@ -70,11 +70,11 @@ class Block extends THREE.Group {
                 this.position.z += (this.h - this.w) * 10
             }
         }
-        console.log(this.w, this.h)
-        console.log(left, this.rotationID)
+        this.rotateShape(left)
 
+        console.log(this.shape)
 
-        // if (this.w % 2 == 0 != this.h % 2 == 0) {
+        // if (this.w % 2 == 0 != this.h % 2 ==   0) {
         //     if (this.rotationID % 2 == 0) {
         //         //this.position.x += 5 * this.w - 5
         //         //this.position.z += 5 * this.h - 5
@@ -114,6 +114,32 @@ class Block extends THREE.Group {
         // this.geometry.dispose()
         // this.material.dispose()
         scene.remove(this)
+    }
+
+    rotateShape(left) {
+        let res = []
+        let xLen = this.shape.length
+        let zLen = this.shape[0].length
+
+        if (left) {
+            for (let i = 0; i < zLen; i++) {
+                let r = []
+                for (let j = 0; j < xLen; j++) {
+                    r.push(this.shape[j][this.h - i - 1])
+                }
+                res.push(r)
+            }
+        } else {
+            for (let i = 0; i < zLen; i++) {
+                let r = []
+                for (let j = 0; j < xLen; j++) {
+                    r.push(this.shape[this.w - j - 1][i])
+                }
+                res.push(r)
+            }
+        }
+
+        this.shape = res
     }
 }
 
