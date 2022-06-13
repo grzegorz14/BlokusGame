@@ -54,9 +54,6 @@ class Game {
 
         window.addEventListener("keydown", (e) => {
             if (this.placementHelper) {
-                console.log(e.keyCode)
-                let w = this.placementHelper.w
-                let h = this.placementHelper.h
                 // Movement Code
                 if (e.keyCode == 81) {
                     // Rotate Helper Left
@@ -74,11 +71,14 @@ class Game {
                     this.placementHelper.fullRotate(false)
                 }
 
+                let w = this.placementHelper.w
+                let h = this.placementHelper.h
+
                 if (e.keyCode == 87 && this.placementCoords.z > 0) {
                     // Move helper up
                     this.placementHelper.position.z += 10
                     this.placementCoords.z -= 1
-                } else if (e.keyCode == 83 && this.placementCoords.z < (14 - ((this.placementHelper.rotationID % 2 == 0) ? h : w))) {
+                } else if (e.keyCode == 83 && this.placementCoords.z < 14 - h) {
                     // Move helper down
                     this.placementHelper.position.z -= 10
                     this.placementCoords.z += 1
@@ -88,29 +88,19 @@ class Game {
                     // Move helper left
                     this.placementHelper.position.x += 10
                     this.placementCoords.x -= 1
-                } else if (e.keyCode == 68 && this.placementCoords.x < (14 - ((this.placementHelper.rotationID % 2 == 0) ? w : h))) {
+                } else if (e.keyCode == 68 && this.placementCoords.x < 14 - w) {
                     // Move helper right
                     this.placementHelper.position.x -= 10
                     this.placementCoords.x += 1
                 }
 
                 if (e.keyCode == 32) {
-                    // Place Block
-                    // TODO: Validation
-                    let xLim = this.placementHelper.rotationID % 2 == 0 ? w : h
-                    let zLim = this.placementHelper.rotationID % 2 == 0 ? h : w
-                    for (let i = 0; i < xLim; i++) {
-                        for (let j = 0; j < zLim; j++) {
-                            console.log(this.placementCoords.x, i, this.placementCoords.z, j)
-                            this.board[this.placementCoords.x + i][this.placementCoords.z + j] = this.placementHelper.shape[i][j]
-                        }
-                    }
-                    console.log(this.board)
+                    this.placeBlock()
                 }
 
                 // Prevent Clipping out of board
-                let overflowX = this.placementCoords.x + ((this.placementHelper.rotationID % 2 == 0) ? w : h) - 14
-                let overflowZ = this.placementCoords.z + ((this.placementHelper.rotationID % 2 == 0) ? h : w) - 14
+                let overflowX = this.placementCoords.x + w - 14
+                let overflowZ = this.placementCoords.z + h - 14
                 if (overflowX > 0) {
                     this.placementHelper.position.x += 10 * overflowX
                     this.placementCoords.x -= overflowX
@@ -120,11 +110,77 @@ class Game {
                     this.placementHelper.position.z += 10 * overflowZ
                     this.placementCoords.z -= overflowZ
                 }
-
+                //console.log(this.placementCoords.x, this.placementCoords.z, w, h, overflowX, overflowZ)
             }
         })
 
         this.render()
+    }
+
+    placeBlock = () => {
+        // Place Block
+        // TODO: Validation
+        this.validatePlacement()
+
+        let w = this.placementHelper.w
+        let h = this.placementHelper.h
+        for (let i = 0; i < w; i++) {
+            for (let j = 0; j < h; j++) {
+                if (this.placementHelper.shape[i][j] == 1) {
+                    this.board[this.placementCoords.z + j][this.placementCoords.x + i] = this.placementHelper.shape[i][j]
+                }
+            }
+        }
+    }
+
+    validatePlacement = () => {
+        let w = this.placementHelper.w
+        let h = this.placementHelper.h
+
+        // adjecancy grid
+        let adj = []
+        let top = 1,
+            bottom = 1,
+            right = 1,
+            left = 1
+        let overflowX = this.placementCoords.x + w - 14
+        let overflowZ = this.placementCoords.z + h - 14
+        if (overflowX > -1) right = 0
+        if (overflowZ > -1) bottom = 0
+        if (this.placementCoords.x == 0) left = 0
+        if (this.placementCoords.z == 0) top = 0
+
+
+        //console.log(top, bottom, right, left,)
+        for (let i = 0; i < h + bottom + top; i++) {
+            let r = []
+            for (let j = 0; j < w + right + left; j++) {
+                // top outer
+                if (top == 1 && i == 0 && j != -1 + left && j != w + left)
+                    console.log("Top Outer", i, j)
+                // bottom outer
+                if (bottom == 1 && i == w + bottom + top - 1 && j != -1 + left && j != w + left)
+                    console.log("Bottom Outer", i, j)
+                // left outer
+                if (left == 1 && j == 0 && i != -1 + top && i != h + top)
+                    console.log("Left Outer", i, j)
+                // right outer
+                if (right == 1 && j == h + right + left - 1 && i != -1 + bottom && i != h + bottom)
+                    console.log("Right Outer", i, j)
+                // inner
+            }
+        }
+
+        let isSpaceEmpty = true
+        for (let i = 0; i < w; i++) {
+            for (let j = 0; j < h; j++) {
+                if (this.placementHelper.shape[i][j] == 1) {
+                    if (this.board[this.placementCoords.z + j][this.placementCoords.x + i] != 0) {
+                        isSpaceEmpty = false
+                    }
+                }
+            }
+        }
     }
 
     selectBlock = (id) => {
@@ -158,8 +214,8 @@ class Game {
             this.placementHelper.setRotation(rot)
 
             // Prevent Clipping out of board
-            let overflowX = this.placementCoords.x + ((this.placementHelper.rotationID % 2 == 0) ? w : h) - 14
-            let overflowZ = this.placementCoords.z + ((this.placementHelper.rotationID % 2 == 0) ? h : w) - 14
+            let overflowX = this.placementCoords.x + w - 14
+            let overflowZ = this.placementCoords.z + h - 14
             if (overflowX > 0) {
                 this.placementHelper.position.x += 10 * overflowX
                 this.placementCoords.x -= overflowX
@@ -193,7 +249,6 @@ class Game {
             }
             this.board.push(row)
         }
-        console.log(this.board)
     }
 
     setPlayerPosition = () => {

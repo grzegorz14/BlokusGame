@@ -7,8 +7,11 @@ class Block extends THREE.Group {
         this.shape = shape
         this.player = player
         this.rotationID = 0
-        this.w = this.shape.length
-        this.h = this.shape[0].length
+        this.isHelper = isHelper
+        this.w = this.shape[0].length
+        this.h = this.shape.length
+        this.xSize = this.shape[0].length
+        this.zSize = this.shape.length
 
         this.init()
     }
@@ -22,8 +25,8 @@ class Block extends THREE.Group {
         for (let i = 0; i < this.shape.length; i++) {
             for (let j = 0; j < this.shape[i].length; j++) {
                 if (this.shape[i][j] == 1) {
-                    let segment = new Segment(this.isHelper)
-                    segment.position.set(-10 * this.shape[i].length + 10 * j + 5, 0, -10 * i - 5)
+                    let segment = new Segment(this.player, this.isHelper)
+                    segment.position.set(-10 * j - 5, 0, -10 * i - 5)
                     this.add(segment)
                 }
             }
@@ -36,43 +39,47 @@ class Block extends THREE.Group {
             this.rotationID = (this.rotationID + 3) % 4
 
             if (this.rotationID == 0) {
-                this.position.x += this.h * 10
+                this.position.x += this.zSize * 10
                 //this.position.x += -(this.h - this.w) * 10
             }
             if (this.rotationID == 1) {
-                this.position.z += this.h * 10
-                this.position.x -= (this.h - this.w) * 10
+                this.position.z += this.zSize * 10
+                this.position.x -= (this.zSize - this.xSize) * 10
             }
             if (this.rotationID == 2) {
-                this.position.x -= this.w * 10
-                this.position.z -= (this.h - this.w) * 10
+                this.position.x -= this.xSize * 10
+                this.position.z -= (this.zSize - this.xSize) * 10
             }
             if (this.rotationID == 3) {
-                this.position.z -= this.w * 10
+                this.position.z -= this.xSize * 10
             }
         } else {
             this.rotation.y -= Math.PI / 2
             this.rotationID = (this.rotationID + 5) % 4
 
             if (this.rotationID == 0) {
-                this.position.z += this.w * 10
+                this.position.z += this.xSize * 10
             }
             if (this.rotationID == 1) {
-                this.position.x -= this.h * 10
+                this.position.x -= this.zSize * 10
                 //this.position.x += -(this.h - this.w) * 10
             }
             if (this.rotationID == 2) {
-                this.position.z -= this.h * 10
-                this.position.x += (this.h - this.w) * 10
+                this.position.z -= this.zSize * 10
+                this.position.x += (this.zSize - this.xSize) * 10
             }
             if (this.rotationID == 3) {
-                this.position.x += this.w * 10
-                this.position.z += (this.h - this.w) * 10
+                this.position.x += this.xSize * 10
+                this.position.z += (this.zSize - this.xSize) * 10
             }
         }
         this.rotateShape(left)
 
-        console.log(this.shape)
+        let storew = this.w
+        this.w = this.h
+        this.h = storew
+
+        //console.log(this.shape)
 
         // if (this.w % 2 == 0 != this.h % 2 ==   0) {
         //     if (this.rotationID % 2 == 0) {
@@ -95,15 +102,8 @@ class Block extends THREE.Group {
     }
 
     setRotation(rot) {
-        let c = this.rotationID - rot
-
-        for (let i = 0; i < Math.abs(c); i++) {
-            if (c < 0) {
-                this.fullRotate(true)
-            }
-            else {
-                this.fullRotate(false)
-            }
+        for (let i = 0; i < rot; i++) {
+            this.fullRotate(false)
         }
     }
 
@@ -118,22 +118,19 @@ class Block extends THREE.Group {
 
     rotateShape(left) {
         let res = []
-        let xLen = this.shape.length
-        let zLen = this.shape[0].length
-
         if (left) {
-            for (let i = 0; i < zLen; i++) {
+            for (let i = 0; i < this.w; i++) {
                 let r = []
-                for (let j = 0; j < xLen; j++) {
-                    r.push(this.shape[j][this.h - i - 1])
+                for (let j = 0; j < this.h; j++) {
+                    r.push(this.shape[j][this.w - i - 1])
                 }
                 res.push(r)
             }
         } else {
-            for (let i = 0; i < zLen; i++) {
+            for (let i = 0; i < this.w; i++) {
                 let r = []
-                for (let j = 0; j < xLen; j++) {
-                    r.push(this.shape[this.w - j - 1][i])
+                for (let j = 0; j < this.h; j++) {
+                    r.push(this.shape[this.h - j - 1][i])
                 }
                 res.push(r)
             }
