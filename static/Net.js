@@ -96,7 +96,7 @@ class Net {
 
         this.audio.play()
 
-        this.updateInterval = setInterval(this.update, 200)
+        this.updateInterval = setInterval(this.update, 400)
     }
 
     update = async () => {
@@ -173,7 +173,8 @@ class Net {
     }
 
     placeBlock = async (id, coords) => {
-        this.game.placeEnemy(coords)
+        console.log("placing block")
+        this.game.placeEnemy(id, coords)
         this.lastBlockId = id
     }
 
