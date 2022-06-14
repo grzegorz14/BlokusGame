@@ -168,7 +168,8 @@ class Game {
                 blockId: this.pickedBlockId,
                 coords: this.placementCoords,
                 points: pointsCounter,
-                player: this.player
+                player: this.player,
+                board: this.board
             })
             await fetch("/placeBlock", { method: "post", headers, body })
             console.log("succesed")

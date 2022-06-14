@@ -1,3 +1,10 @@
+const Datastore = require('nedb')
+
+const gameData = new Datastore({
+    filename: './db/gameData.db',
+    autoload: true
+});
+
 const express = require("express")
 const app = express()
 const path = require("path")
@@ -5,6 +12,7 @@ var PORT = process.env.PORT || 3000
 
 app.use(express.json())
 app.use(express.static("static"))
+app.use(express.urlencoded({ extended: true }))
 
 app.get("/", async function (req, res) {
     res.sendFile(path.join(__dirname + "/static/index.html"))
@@ -30,6 +38,7 @@ const clearBoard = [ // 0 - empty, 1 - player 1 segment, 2 - player 2 segment
 var coords = null
 var blockId = -1
 
+var boardState = clearBoard
 var players = []
 var points1 = 0
 var points2 = 0
@@ -47,6 +56,20 @@ app.post("/addPlayer", (req, res) => {
                 res.json({ success: false, info: "This login is occupied. Please choose different one." })
             }
             else {
+                gameData.remove({ _id: "gameState" }, {}, function (err, state) {
+                    console.log("State deleted")
+                })
+
+                const gameState = {
+                    _id: "gameState",
+                    points1: 0,
+                    points2: 0,
+                    board: boardState
+                }
+                gameData.insert(gameState, function (err, record) {
+                    console.log("State added")
+                })
+
                 players.push(login)
                 res.json({ success: true, player: 1 })
             }
@@ -77,9 +100,22 @@ app.post("/placeBlock", (req, res) => {
     console.log("Placed Block", blockId)
     coords = req.body.coords
     sender = req.body.player
+    boardState = req.body.board
 
     if (req.body.player == 1) points1 += req.body.points
     else points2 += req.body.points
+
+    let newState = {
+        _id: "gameState",
+        points1: points1,
+        points2: points2,
+        board: boardState
+    }
+
+    gameData.update({ _id: "gameState" }, { $set: newState }, {}, function (err, record) {
+        console.log("State updated")
+    });
+
     res.json({ success: true })
 })
 
@@ -91,6 +127,14 @@ app.post("/getBlock", (req, res) => {
     } else {
         res.json({ blockId: -1, coords, win, points1, points2, finishedCounter })
     }
+})
+
+app.post("/getState", (req, res) => {
+    gameData.findOne({ _id: "gameState" }, function (err, record) {
+        //console.log(JSON.stringify(record, null, 3))
+        //res.json({ board: JSON.stringify(record.board), points1, points2 })
+        res.json({ board: record.board, points1, points2 })
+    })
 })
 
 app.post("/finishGame", (req, res) => {
@@ -107,7 +151,6 @@ app.post("/resetRequest", (req, res) => {
     (reset += 1) == 2 && resetGame()
     res.json({ success: true })
 })
-
 
 app.post("/reset", (req, res) => {
     resetGame()

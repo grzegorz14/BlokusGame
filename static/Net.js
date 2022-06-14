@@ -126,11 +126,15 @@ class Net {
                 clearInterval(this.updateInterval)
                 const winner = data.points1 > data.points2 ? 1 : (data.points1 == data.points2 ? 0 : 2)
                 const points = this.game.player == 1 ? data.points1 : data.points2
+                const opponentPoints = this.game.player == 1 ? data.points2 : data.points1
                 if (this.game.player == winner) {
-                    this.gameEnd(`YOU WIN - ${points} POINTS!`)
+                    this.gameEnd(`YOU WIN - ${points} vs ${opponentPoints} points!`)
+                }
+                else if (this.game.opponent == winner) {
+                    this.gameEnd(`YOU LOSE - ${points} vs ${opponentPoints} points!`)
                 }
                 else {
-                    this.gameEnd(`YOU LOSE - ${points} POINTS!`)
+                    this.gameEnd(`DRAW - each player has ${points} points!`)
                 }
                 await fetch("/resetRequest", { method: "post" })
             }
@@ -203,7 +207,7 @@ class Net {
                 await fetch("/win", { method: "post", headers, body })
 
                 this.gameEnd("YOU WIN!")
-                await fetch("/resetRequest", { method: "post" })
+                await fetch("/resetRequest", { method: "post", headers, body })
             }
             else {
                 this.ui.counter.textContent = secondsLeft
@@ -233,7 +237,7 @@ class Net {
                 await fetch("/win", { method: "post", headers, body })
 
                 this.gameEnd("YOU LOSE!")
-                await fetch("/resetRequest", { method: "post" })
+                await fetch("/resetRequest", { method: "post", headers, body })
             }
         }, 1000)
     }
@@ -260,6 +264,17 @@ class Net {
         const body = JSON.stringify({ player: this.game.player })
         const headers = { "Content-Type": "application/json" }
         await fetch("/finishGame", { method: "post", headers, body })
+
+        //log database data
+        let response = await fetch("/getState", { method: "post", headers, body })
+        await response.json().then(data => {
+            console.log("---- Database data ----")
+            console.log(`Player 1 points: ${data.points1}`)
+            console.log(`Player 2 points: ${data.points2}`)
+            console.log(`Board state:`)
+            console.log(data.board)
+            console.log("-----------------------")
+        })
     }
 
     gameEnd = (message) => {
