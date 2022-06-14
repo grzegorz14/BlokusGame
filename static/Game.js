@@ -99,10 +99,6 @@ class Game {
                     this.placementCoords.x += 1
                 }
 
-                if (e.keyCode == 32) {
-                    this.yourTurn && this.placeBlock()
-                }
-
                 // Prevent Clipping out of board
                 let overflowX = this.placementCoords.x + w - 14
                 let overflowZ = this.placementCoords.z + h - 14
@@ -117,6 +113,12 @@ class Game {
                 }
 
                 this.placementHelper.placable(this.validatePlacement())
+
+                // place block
+                if (e.keyCode == 32) {
+                    this.yourTurn && this.placeBlock()
+                }
+
                 console.log(this.placementCoords.x, this.placementCoords.z, w, h, overflowX, overflowZ)
             }
         })
@@ -128,6 +130,7 @@ class Game {
         // Place Block
         if (this.validatePlacement()) {
             this.firstMove = false
+            this.placementCoords.rot = this.placementHelper.rotationID
 
             let pointsCounter = 0
             let w = this.placementHelper.w
@@ -173,14 +176,28 @@ class Game {
         let block = new Block(Blocks.blocks[id], !this.player, false)
         this.scene.add(block)
 
-        block.setRotation(coords.rot)
-
         // position in default rotation on current position
         block.position.set(
-            coords.x * 10 - 70,
+            coords.x * 10 - 70 + 10 * block.h,
             0,
-            coords.z * 10 - 70
+            coords.z * 10 - 70 + 10 * block.w
         )
+
+        block.setRotation(coords.rot + 2)
+
+        let w = block.w
+        let h = block.h
+        // add to array
+        for (let i = 0; i < h; i++) {
+            for (let j = 0; j < w; j++) {
+                if (block.shape[i][j] == 1) {
+                    pointsCounter += 1
+                    this.board[14 - h - coords.z + i][14 - w - coords.x + j] = block.shape[i][j]
+                }
+            }
+        }
+
+        console.log("enemy move done")
     }
 
     validatePlacement = () => {
