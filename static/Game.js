@@ -139,7 +139,7 @@ class Game {
         }
 
         //removes block button from ui
-        document.getElementById("your" + this.pickedBlockId).remove() 
+        document.getElementById("your" + this.pickedBlockId)?.remove() 
         document.getElementById("yourPoints").innerText = parseInt(document.getElementById("yourPoints").innerText) + pointsCounter
 
         this.moved = true
