@@ -12,7 +12,7 @@ class Net {
         this.finished = false
         this.firstAfterPass = false
 
-        this.audio = new Audio('./sounds/bad-piggies-drip.mp3')
+        this.audio = new Audio('./../sounds/bad-piggies-song.mp3')
 
         document.getElementById("playButton").onclick = this.play
         document.getElementById("resetButton").onclick = this.reset
