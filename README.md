@@ -14,7 +14,11 @@ Our game is a copy of well known board game - Blokus.
   
 ### Gameplay keys:
 A W S D - move block left/up/down/right 
+
 Q E - rotate block left/right 
+
 F - flip block
+
 SPACE - place block
+
 1 2 3 - change board camera view
