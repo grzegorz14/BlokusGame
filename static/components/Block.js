@@ -20,8 +20,8 @@ class Block extends THREE.Group {
 
     init = () => {
         // <DEBUG>
-        const axesHelper = new THREE.AxesHelper(5);
-        this.add(axesHelper);
+        // const axesHelper = new THREE.AxesHelper(5)
+        // this.add(axesHelper)
         // </DEBUG>
 
         for (let i = 0; i < this.shape.length; i++) {

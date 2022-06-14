@@ -81,7 +81,7 @@ class Game {
                 let h = this.placementHelper.h
 
                 if (e.keyCode == 70) {
-                    console.log("flip")
+                    //console.log("flip")
                     this.placementHelper.flip()
                 }
 
@@ -150,7 +150,7 @@ class Game {
 
             this.placementHelper.materialize()
 
-            console.log(this.board)
+            //console.log(this.board)
 
             this.placementCoords.fl = this.placementHelper.flipped
 
@@ -162,7 +162,7 @@ class Game {
 
             this.moved = true
 
-            console.log(this.pickedBlockId)
+            //console.log(this.pickedBlockId)
             const headers = { "Content-Type": "application/json" }
             let body = JSON.stringify({
                 blockId: this.pickedBlockId,
@@ -172,7 +172,7 @@ class Game {
                 board: this.board
             })
             await fetch("/placeBlock", { method: "post", headers, body })
-            console.log("succesed")
+            console.log("Block placed")
         }
     }
 
@@ -182,7 +182,7 @@ class Game {
         this.scene.add(block)
 
         // position in default rotation on current position
-        console.log(coords)
+        //console.log(coords)
 
         let xMod = coords.rot % 2 == 0 ? block.w : block.h
         let yMod = coords.rot % 2 == 0 ? block.h : block.w
@@ -215,7 +215,7 @@ class Game {
             }
         }
 
-        console.log("enemy move done")
+        console.log("Enemy move done")
     }
 
     validatePlacement = () => {
@@ -297,7 +297,7 @@ class Game {
 
                         if (count > 1) {
                             if (this.board[this.placementCoords.z + i - top][this.placementCoords.x + j - left] == this.player) {
-                                console.log(i, j)
+                                //console.log(i, j)
                                 connected = true
                             }
                         }
