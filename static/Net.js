@@ -100,9 +100,16 @@ class Net {
     }
 
     update = async () => {
-        let response = await fetch("/getBlock", { method: "post" })
+        const headers = { "Content-Type": "application/json" }
+        let body = JSON.stringify({
+            player: this.game.player
+        })
+
+        let response = await fetch("/getBlock", { method: "post", headers, body })
 
         await response.json().then(async data => {
+            console.log("id on srvr:", data.blockId)
+
             if (data.win == this.game.opponent) { //opponent wins by timer
                 console.log("LOSE")
                 clearInterval(this.updateInterval)
@@ -138,6 +145,9 @@ class Net {
                 this.startTimer()
                 this.game.yourTurn = false
                 this.game.moved = false
+            }
+            else {
+                //console.log(this.game.yourTurn, this.game.moved, this.lastBlockId, data.blockId)
             }
         })
     }

@@ -118,8 +118,6 @@ class Game {
                 if (e.keyCode == 32) {
                     this.yourTurn && this.placeBlock()
                 }
-
-                console.log(this.placementCoords.x, this.placementCoords.z, w, h, overflowX, overflowZ)
             }
         })
 
@@ -139,7 +137,7 @@ class Game {
                 for (let j = 0; j < w; j++) {
                     if (this.placementHelper.shape[i][j] == 1) {
                         pointsCounter += 1
-                        this.board[this.placementCoords.z + i][this.placementCoords.x + j] = this.placementHelper.shape[i][j]
+                        this.board[this.placementCoords.z + i][this.placementCoords.x + j] = this.placementHelper.shape[i][j] == 1 ? this.player : 0
                     }
                 }
             }
@@ -151,15 +149,12 @@ class Game {
             this.placementHelper = null
 
             //removes block button from ui
-            try {
-                document.getElementById("your" + this.pickedBlockId)?.remove()
-                document.getElementById("yourPoints").innerText = parseInt(document.getElementById("yourPoints").innerText) + pointsCounter
-            } catch {
-
-            }
+            document.getElementById("your" + this.pickedBlockId)?.remove()
+            document.getElementById("yourPoints").innerText = parseInt(document.getElementById("yourPoints").innerText) + pointsCounter
 
             this.moved = true
 
+            console.log(this.pickedBlockId)
             const headers = { "Content-Type": "application/json" }
             let body = JSON.stringify({
                 blockId: this.pickedBlockId,
@@ -168,12 +163,13 @@ class Game {
                 player: this.player
             })
             await fetch("/placeBlock", { method: "post", headers, body })
+            console.log("succesed")
         }
     }
 
     placeEnemy(id, coords) {
         // make new block
-        let block = new Block(Blocks.blocks[id], !this.player, false)
+        let block = new Block(Blocks.blocks[id], this.player, false)
         this.scene.add(block)
 
         // position in default rotation on current position
@@ -191,8 +187,8 @@ class Game {
         for (let i = 0; i < h; i++) {
             for (let j = 0; j < w; j++) {
                 if (block.shape[i][j] == 1) {
-                    pointsCounter += 1
-                    this.board[14 - h - coords.z + i][14 - w - coords.x + j] = block.shape[i][j]
+                    // not defined -> pointsCounter += 1
+                    this.board[14 - h - coords.z + i][14 - w - coords.x + j] = block.shape[i][j] == 1 ? 3 - this.player : 0
                 }
             }
         }
@@ -219,30 +215,14 @@ class Game {
         let doesNotTouch = true
         let connected = false
 
+        let adj = []
         for (let i = 0; i < h + bottom + top; i++) {
+            let row = []
+
             for (let j = 0; j < w + right + left; j++) {
-                // // top outer
-                // if (top == 1 && i == 0 && j != -1 + left && j != w + left) {
-                //     console.log("Top Outer", i, j)
-                //     row.push(this.placementHelper.shape[i + 1 - top][j - left])
-                // }
-                // // bottom outer
-                // else if (bottom == 1 && i == w + bottom + top - 1 && j != -1 + left && j != w + left) {
-                //     console.log("Bottom Outer", i, j)
-                //     row.push(this.placementHelper.shape[i - 1 - top][j - left])
-                // }
-                // // left outer
-                // else if (left == 1 && j == 0 && i != -1 + top && i != h + top) {
-                //     console.log("Left Outer", i, j)
-                //     row.push(this.placementHelper.shape[i - top][j + 1 - left])
-                // }
-                // // right outer
-                // else if (right == 1 && j == h + right + left - 1 && i != -1 + bottom && i != h + bottom) {
-                //     console.log("Right Outer", i, j)
-                //     row.push(this.placementHelper.shape[i - top][j - 1 - left])
-                // }
 
                 let populate = false
+
                 if (i < h + top - 1 && j != -1 + left && j != left + w) {
                     if (this.placementHelper.shape[i - top + 1][j - left] == 1)
                         populate = true
@@ -260,10 +240,12 @@ class Game {
                         populate = true
                 }
 
-                if (populate && this.board[this.placementCoords.z + i - top][this.placementCoords.x + j - left] == 1) {
+                if (populate && this.board[this.placementCoords.z + i - top][this.placementCoords.x + j - left] == this.player) {
                     doesNotTouch = false
                 }
+                row.push(populate ? 1 : 0)
             }
+            adj.push(row)
         }
 
         let isSpaceEmpty = true
@@ -279,17 +261,27 @@ class Game {
 
         if (this.firstMove && this.placementCoords.x == 0 && this.placementCoords.z == 14 - h) {
             connected = true
-
         }
-        // DEBUG
         else if (!this.firstMove) {
-            connected = true
+            for (let i = 0; i < h + bottom + top; i++) {
+                for (let j = 0; j < w + right + left; j++) {
+                    if (adj[i][j] == 0) {
+                        let count = 0
 
+                        if (i != 0 && adj[i - 1][j] == 1) count += 1
+                        if (j != 0 && adj[i][j - 1] == 1) count += 1
+                        if (i != h + bottom + top - 1 && adj[i + 1][j] == 1) count += 1
+                        if (j != w + right + left - 1 && adj[i][j + 1] == 1) count += 1
+
+                        if (count > 1) {
+                            if (this.board[this.placementCoords.z + i - top][this.placementCoords.x + j - left] == this.player) {
+                                connected = true
+                            }
+                        }
+                    }
+                }
+            }
         }
-        // DEBUG
-
-        console.log(isSpaceEmpty, doesNotTouch, connected)
-
         return isSpaceEmpty && doesNotTouch && connected
     }
 

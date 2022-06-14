@@ -36,6 +36,7 @@ var points2 = 0
 var finished = 0
 var win = null
 var reset = 0
+var sender = -1
 
 app.post("/addPlayer", (req, res) => {
     let login = req.body.login
@@ -45,7 +46,7 @@ app.post("/addPlayer", (req, res) => {
         case 1:
             if (login == players[0]) {
                 res.json({ success: false, info: "This login is occupied. Please choose different one." })
-            } 
+            }
             else {
                 players.push(login)
                 res.json({ success: true, player: 1 })
@@ -56,7 +57,7 @@ app.post("/addPlayer", (req, res) => {
             players.push(login)
             res.json({ success: true, player: 2 })
             break
-        default: 
+        default:
             res.json({ success: false, info: "The game is on! Wait until players finish or click reset button." })
             break
     }
@@ -68,22 +69,30 @@ app.post("/waitingForOpponent", (req, res) => {
 
 app.post("/placeBlock", (req, res) => {
     blockId = req.body.blockId
+    console.log("Placed Block", blockId)
     coords = req.body.coords
+    sender = req.body.player
+
     if (req.body.player == 1) points1 += req.body.points
     else points2 += req.body.points
     res.json({ success: true })
 })
 
 app.post("/getBlock", (req, res) => {
-    res.json({ blockId, coords, win, points1, points2, finished })
-    blockId = -1
+    console.log("Got Block", blockId)
+    if (sender != req.body.player) {
+        res.json({ blockId, coords, win, points1, points2, finished })
+        blockId = -1
+    } else {
+        res.json({ blockId: -1, coords, win, points1, points2, finished })
+    }
 })
 
 app.post("/finishGame", (req, res) => {
     finished += 1
     if (finished == 2) {
         win = points1 > points2 ? 1 : 2
-    } 
+    }
 })
 
 app.post("/win", (req, res) => {
