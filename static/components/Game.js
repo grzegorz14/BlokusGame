@@ -32,7 +32,7 @@ class Game {
         this.pickedBlockId = -1
         this.pickedBlock = null
         this.placementHelper = null
-        this.placementCoords = { x: 0, z: 0, rot: 0, fl: false }
+        this.placementCoords = { x: 0, z: -1, rot: 0, fl: false }
         // koordynaty x i y od lewego gornego rogu planszy, ulozone jak axes. 
         //Rot ma wartosc 0-3, gdzie zero to oryginalna, a za kazde +1 obraca sie o 90 w prawo
 
@@ -119,6 +119,8 @@ class Game {
                 }
 
                 this.placementHelper.placable(this.validatePlacement())
+
+                console.log(this.placementCoords, this.placementHelper.w, this.placementHelper.h, this.placementHelper.flipped)
 
                 // place block
                 if (e.keyCode == 32) {
@@ -323,6 +325,10 @@ class Game {
         // make new block
         let block = new Block(Blocks.blocks[id], this.player, true)
         this.scene.add(block)
+
+        if (this.placementCoords.z = -1) {
+            this.placementCoords.z = 14 - block.h
+        }
 
         // replace old helper
         if (this.placementHelper) {

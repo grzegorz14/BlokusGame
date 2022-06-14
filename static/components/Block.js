@@ -48,7 +48,10 @@ class Block extends THREE.Group {
         this.shape = arr
 
         this.segments.forEach(s => {
-            s.position.x = this.w * -10 - s.position.x
+            console.log("+++++")
+            console.log(s.position)
+            s.position.x = (this.rotationID % 2 == 0 ? this.w : this.h) * -10 - s.position.x
+            console.log(s.position)
         })
         this.flipped = !this.flipped
     }
