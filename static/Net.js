@@ -221,6 +221,20 @@ class Net {
         this.timerInterval = setInterval(async () => {
             this.ui.yourCounter.textContent = secondsLeft
             secondsLeft -= 1
+            if (secondsLeft == 0) {
+                clearInterval(this.timerInterval)
+                clearInterval(this.updateInterval)
+
+                console.log("LOSE")
+
+                //lose by timer
+                const body = JSON.stringify({ player: this.game.opponent })
+                const headers = { "Content-Type": "application/json" }
+                await fetch("/win", { method: "post", headers, body })
+
+                this.gameEnd("YOU LOSE!")
+                await fetch("/resetRequest", { method: "post" })
+            }
         }, 1000)
     }
 
@@ -256,6 +270,7 @@ class Net {
         this.ui.hide(this.ui.opponentsBlocks)
         this.ui.hide(this.ui.dialog)
         this.ui.hide(this.ui.counter)
+        this.ui.hide(this.ui.yourCounter)
         this.ui.addMist()
 
         this.ui.dialog.innerText = message
