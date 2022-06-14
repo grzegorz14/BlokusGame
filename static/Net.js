@@ -100,36 +100,46 @@ class Net {
     }
 
     update = async () => {
-        if (!this.game.yourTurn && !this.game.moved) {
-            let response = await fetch("/getBlock", { method: "post" })
+        let response = await fetch("/getBlock", { method: "post" })
 
-            await response.json().then(async data => {
-                if (data.win == this.game.opponent) { //opponent wins by timer
-                    console.log("LOSE")
-                    clearInterval(this.updateInterval)
-                    this.gameEnd("YOU LOSE!")
-                    await fetch("/resetRequest", { method: "post" })
+        await response.json().then(async data => {
+            if (data.win == this.game.opponent) { //opponent wins by timer
+                console.log("LOSE")
+                clearInterval(this.updateInterval)
+                this.gameEnd("YOU LOSE!")
+                await fetch("/resetRequest", { method: "post" })
+            }
+            else if (data.finished == 2) { //both players finished
+                clearInterval(this.updateInterval)
+                const winner = data.points1 > data.points2 ? 1 : (data.points1 == data.points2 ? 0 : 2)
+                const points = this.game.player == 1 ? data.points1 : data.points2
+                if (this.game.player == winner) {
+                    this.gameEnd(`YOU WIN - ${points} POINTS!`)
                 }
-                else if (this.lastBlockId != data.blockId && data.blockId > -1) { //opponent moves
-                    await this.placeBlock(data.blockId, data.coords)
-                    clearInterval(this.timerInterval)
-                    this.ui.removeMist()
-                    this.ui.hide(this.ui.dialog)
-                    this.ui.hide(this.ui.counter)
-                    this.ui.moveTurnTile()
-
-                    document.getElementById("opponentPoints").innerText = this.game.opponent == 1 ? data.points1 : data.points2
-
-                    this.game.yourTurn = true
+                else {
+                    this.gameEnd(`YOU LOSE - ${points} POINTS!`)
                 }
-            })
-        }
-        else if (this.game.moved) {
-            this.ui.moveTurnTile()
-            this.startTimer()
-            this.game.yourTurn = false
-            this.game.moved = false
-        }
+                await fetch("/resetRequest", { method: "post" })
+            }
+            else if (!this.game.yourTurn && !this.game.moved && this.lastBlockId != data.blockId && data.blockId > -1) { //opponent moves
+                await this.placeBlock(data.blockId, data.coords)
+                clearInterval(this.timerInterval)
+                this.ui.removeMist()
+                this.ui.hide(this.ui.dialog)
+                this.ui.hide(this.ui.counter)
+                this.ui.moveTurnTile()
+
+                document.getElementById("opponentPoints").innerText = this.game.opponent == 1 ? data.points1 : data.points2
+
+                this.game.yourTurn = true
+            }
+            else if (this.game.moved) {
+                this.ui.moveTurnTile()
+                this.startTimer()
+                this.game.yourTurn = false
+                this.game.moved = false
+            }
+        })
     }
 
     startTimer = () => {
@@ -163,7 +173,7 @@ class Net {
     }
 
     placeBlock = async (id, coords) => {
-        console.log("Placing block " + id)
+        this.game.placeEnemy(coords)
         this.lastBlockId = id
     }
 
