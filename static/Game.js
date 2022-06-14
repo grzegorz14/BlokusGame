@@ -20,6 +20,7 @@ class Game {
 
         this.player = null
         this.opponent = null
+        this.firstMove = true
 
         this.moved = false
         this.yourTurn = false
@@ -114,7 +115,9 @@ class Game {
                     this.placementHelper.position.z += 10 * overflowZ
                     this.placementCoords.z -= overflowZ
                 }
-                //console.log(this.placementCoords.x, this.placementCoords.z, w, h, overflowX, overflowZ)
+
+                this.placementHelper.placable(this.validatePlacement())
+                console.log(this.placementCoords.x, this.placementCoords.z, w, h, overflowX, overflowZ)
             }
         })
 
@@ -123,35 +126,44 @@ class Game {
 
     placeBlock = async () => {
         // Place Block
-        // TODO: Validation
-        this.validatePlacement()
-
-        let pointsCounter = 0 
-        let w = this.placementHelper.w
-        let h = this.placementHelper.h
-        for (let i = 0; i < w; i++) {
-            for (let j = 0; j < h; j++) {
-                if (this.placementHelper.shape[i][j] == 1) {
-                    pointsCounter += 1
-                    this.board[this.placementCoords.z + j][this.placementCoords.x + i] = this.placementHelper.shape[i][j]
+        if (this.validatePlacement()) {
+            let pointsCounter = 0
+            let w = this.placementHelper.w
+            let h = this.placementHelper.h
+            for (let i = 0; i < h; i++) {
+                for (let j = 0; j < w; j++) {
+                    if (this.placementHelper.shape[i][j] == 1) {
+                        pointsCounter += 1
+                        this.board[this.placementCoords.z + i][this.placementCoords.x + j] = this.placementHelper.shape[i][j]
+                    }
                 }
             }
+
+            this.placementHelper.materialize()
+
+            console.log(this.board)
+
+            this.placementHelper = null
+
+            //removes block button from ui
+            try {
+                document.getElementById("your" + this.pickedBlockId).remove()
+                document.getElementById("yourPoints").innerText = parseInt(document.getElementById("yourPoints").innerText) + pointsCounter
+            } catch {
+
+            }
+
+            this.moved = true
+
+            const headers = { "Content-Type": "application/json" }
+            let body = JSON.stringify({
+                blockId: this.pickedBlockId,
+                coords: this.placementCoords,
+                points: pointsCounter,
+                player: this.player
+            })
+            await fetch("/placeBlock", { method: "post", headers, body })
         }
-
-        //removes block button from ui
-        document.getElementById("your" + this.pickedBlockId).remove() 
-        document.getElementById("yourPoints").innerText = parseInt(document.getElementById("yourPoints").innerText) + pointsCounter
-
-        this.moved = true
-
-        const headers = { "Content-Type": "application/json" }
-        let body = JSON.stringify({
-            blockId: this.pickedBlockId,
-            coords: this.placementCoords,
-            points: pointsCounter,
-            player: this.player
-        })
-        await fetch("/placeBlock", { method: "post", headers, body })
     }
 
     validatePlacement = () => {
@@ -159,7 +171,6 @@ class Game {
         let h = this.placementHelper.h
 
         // adjecancy grid
-        let adj = []
         let top = 1,
             bottom = 1,
             right = 1,
@@ -171,37 +182,73 @@ class Game {
         if (this.placementCoords.x == 0) left = 0
         if (this.placementCoords.z == 0) top = 0
 
+        let doesNotTouch = true
+        let connected = false
 
-        //console.log(top, bottom, right, left,)
         for (let i = 0; i < h + bottom + top; i++) {
-            let r = []
             for (let j = 0; j < w + right + left; j++) {
-                // top outer
-                if (top == 1 && i == 0 && j != -1 + left && j != w + left)
-                    console.log("Top Outer", i, j)
-                // bottom outer
-                if (bottom == 1 && i == w + bottom + top - 1 && j != -1 + left && j != w + left)
-                    console.log("Bottom Outer", i, j)
-                // left outer
-                if (left == 1 && j == 0 && i != -1 + top && i != h + top)
-                    console.log("Left Outer", i, j)
-                // right outer
-                if (right == 1 && j == h + right + left - 1 && i != -1 + bottom && i != h + bottom)
-                    console.log("Right Outer", i, j)
-                // inner
+                // // top outer
+                // if (top == 1 && i == 0 && j != -1 + left && j != w + left) {
+                //     console.log("Top Outer", i, j)
+                //     row.push(this.placementHelper.shape[i + 1 - top][j - left])
+                // }
+                // // bottom outer
+                // else if (bottom == 1 && i == w + bottom + top - 1 && j != -1 + left && j != w + left) {
+                //     console.log("Bottom Outer", i, j)
+                //     row.push(this.placementHelper.shape[i - 1 - top][j - left])
+                // }
+                // // left outer
+                // else if (left == 1 && j == 0 && i != -1 + top && i != h + top) {
+                //     console.log("Left Outer", i, j)
+                //     row.push(this.placementHelper.shape[i - top][j + 1 - left])
+                // }
+                // // right outer
+                // else if (right == 1 && j == h + right + left - 1 && i != -1 + bottom && i != h + bottom) {
+                //     console.log("Right Outer", i, j)
+                //     row.push(this.placementHelper.shape[i - top][j - 1 - left])
+                // }
+
+                let populate = false
+                if (i < h + top - 1 && j != -1 + left && j != left + w) {
+                    if (this.placementHelper.shape[i - top + 1][j - left] == 1)
+                        populate = true
+                }
+                if (i > top && j != -1 + left && j != left + w) {
+                    if (this.placementHelper.shape[i - top - 1][j - left] == 1)
+                        populate = true
+                }
+                if (j < w + left - 1 && i != -1 + top && i != top + h) {
+                    if (this.placementHelper.shape[i - top][j - left + 1] == 1)
+                        populate = true
+                }
+                if (j > left && i != -1 + top && i != top + h) {
+                    if (this.placementHelper.shape[i - top][j - left - 1] == 1)
+                        populate = true
+                }
+
+                if (populate && this.board[this.placementCoords.z + i - top][this.placementCoords.x + j - left] == 1) {
+                    doesNotTouch = false
+                }
             }
         }
 
         let isSpaceEmpty = true
-        for (let i = 0; i < w; i++) {
-            for (let j = 0; j < h; j++) {
+        for (let i = 0; i < h; i++) {
+            for (let j = 0; j < w; j++) {
                 if (this.placementHelper.shape[i][j] == 1) {
-                    if (this.board[this.placementCoords.z + j][this.placementCoords.x + i] != 0) {
+                    if (this.board[this.placementCoords.z + i][this.placementCoords.x + j] != 0) {
                         isSpaceEmpty = false
                     }
                 }
             }
         }
+
+        if (this.firstMove && this.placementCoords.x == 0 && this.placementCoords.z == 14 - h)
+            connected = true
+
+        console.log(isSpaceEmpty, doesNotTouch, connected)
+
+        return isSpaceEmpty && doesNotTouch && connected
     }
 
     selectBlock = (id) => {
@@ -257,8 +304,14 @@ class Game {
             this.placementHelper = block
 
             // position in default rotation on current position
-            this.placementHelper.position.set(70, 0, 70)
+            this.placementHelper.position.set(
+                70 - this.placementCoords.x * 10,
+                0,
+                70 - this.placementCoords.z * 10
+            )
         }
+
+        this.placementHelper.placable(this.validatePlacement())
     }
 
     createBoard = () => {
@@ -278,7 +331,7 @@ class Game {
     }
 
     setPlayerPosition = () => {
-        this.camera.position.set(0, 120, this.player == 2 ? 180 : -180)
+        this.camera.position.set(0, 120, -180)
         this.camera.lookAt(this.scene.position)
     }
 

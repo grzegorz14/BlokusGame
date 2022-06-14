@@ -76,7 +76,7 @@ class Net {
         this.ui.hide(this.ui.dialog)
         this.ui.removeMist()
 
-        if (this.game.player == 2) { 
+        if (this.game.player == 2) {
             this.ui.moveTurnTile()
             this.startTimer()
             this.game.yourTurn = false
@@ -101,7 +101,7 @@ class Net {
         if (!this.game.yourTurn && !this.game.moved) {
             let response = await fetch("/getBlock", { method: "post" })
 
-            await response.json().then(async data => { 
+            await response.json().then(async data => {
                 if (data.win == this.game.opponent) { //opponent wins by timer
                     console.log("LOSE")
                     clearInterval(this.updateInterval)
