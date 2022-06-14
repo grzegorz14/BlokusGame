@@ -127,6 +127,8 @@ class Game {
     placeBlock = async () => {
         // Place Block
         if (this.validatePlacement()) {
+            this.firstMove = false
+
             let pointsCounter = 0
             let w = this.placementHelper.w
             let h = this.placementHelper.h
@@ -243,8 +245,16 @@ class Game {
             }
         }
 
-        if (this.firstMove && this.placementCoords.x == 0 && this.placementCoords.z == 14 - h)
+        if (this.firstMove && this.placementCoords.x == 0 && this.placementCoords.z == 14 - h) {
             connected = true
+
+        }
+        // DEBUG
+        else if (!this.firstMove) {
+            connected = true
+
+        }
+        // DEBUG
 
         console.log(isSpaceEmpty, doesNotTouch, connected)
 
