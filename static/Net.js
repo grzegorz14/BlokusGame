@@ -4,7 +4,6 @@ class Net {
         this.ui = ui
 
         this.timerInterval = null
-        this.yourTimerInterval = null
         this.updateInterval = null
 
         this.login = ""
@@ -74,7 +73,7 @@ class Net {
         }, 200)
     }
 
-    preparePlayer = () => {
+    preparePlayer = async () => {
         this.ui.hide(this.ui.logingDialog)
         this.ui.hide(this.ui.dialog)
         this.ui.removeMist()
@@ -97,6 +96,11 @@ class Net {
         this.game.setPlayerPosition()
 
         this.audio.play()
+
+        let response = await fetch("/getPlayers", { method: "post" })
+        await response.json().then(data => {
+            document.getElementById("opponentLogin").innerText = this.game.player == 1 ? data.players[0] : data.players[1]
+        })
 
         this.updateInterval = setInterval(this.update, 400)
     }
@@ -130,13 +134,13 @@ class Net {
             }
             else if (data.finishedCounter == 1 && !this.finished) { //opponent finished - you may take any number of moves
                 if (!this.game.yourTurn) { 
-                    clearInterval(this.timerInterval)
                     this.ui.removeMist()
                     this.ui.hide(this.ui.dialog)
                     this.ui.hide(this.ui.counter)
                     this.ui.moveTurnTile()
                 }
 
+                clearInterval(this.timerInterval)
                 this.startYourTimer()
                 this.game.yourTurn = true
                 console.log("your move")
@@ -144,15 +148,21 @@ class Net {
             else if (!this.game.yourTurn && !this.game.moved && this.lastBlockId != data.blockId && data.blockId > -1) { //opponent moves
                 await this.placeBlock(data.blockId, data.coords)
                 clearInterval(this.timerInterval)
-                this.ui.removeMist()
-                this.ui.hide(this.ui.dialog)
-                this.ui.hide(this.ui.counter)
-                this.ui.moveTurnTile()
 
-                document.getElementById("opponentPoints").innerText = this.game.opponent == 1 ? data.points1 : data.points2
-
-                this.startYourTimer()
-                this.game.yourTurn = true
+                if (this.finished) {
+                    this.startTimer()
+                }
+                else {
+                    this.ui.removeMist()
+                    this.ui.hide(this.ui.dialog)
+                    this.ui.hide(this.ui.counter)
+                    this.ui.moveTurnTile()
+    
+                    document.getElementById("opponentPoints").innerText = this.game.opponent == 1 ? data.points1 : data.points2
+    
+                    this.startYourTimer()
+                    this.game.yourTurn = true
+                }
             }
             else if (this.game.moved) {
                 this.ui.hide(this.ui.yourCounter)
@@ -214,8 +224,14 @@ class Net {
     }
 
     finishButtonClick = async (player) => {
+        if (!this.game.yourTurn) return
+
         if (!confirm("Are you sure? You won't take anymore turns.")) return
         console.log("Finish click, player " + player)
+
+        clearInterval(this.timerInterval)
+        this.ui.hide(this.ui.yourCounter)
+        this.startTimer()
 
         this.finished = true
         this.game.yourTurn = false
@@ -226,6 +242,7 @@ class Net {
     }
 
     gameEnd = (message) => {
+        clearInterval(this.timerInterval)
         console.log("game end")
         this.ui.hide(this.ui.moveBox)
         this.ui.hide(this.ui.yourBlocks)

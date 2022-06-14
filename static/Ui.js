@@ -42,6 +42,7 @@ class Ui {
 
         const opponentLogin = document.createElement("p")
         opponentLogin.classList.add("login")
+        opponentLogin.id = "opponentLogin"
         opponentLogin.innerText = "Opponent"
         this.opponentsBlocks.appendChild(opponentLogin)
 
