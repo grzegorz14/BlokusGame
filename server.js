@@ -68,6 +68,10 @@ app.post("/waitingForOpponent", (req, res) => {
     res.json({ success: players.length == 2 })
 })
 
+app.post("/getPlayers", (req, res) => {
+    res.json({ players })
+})
+
 app.post("/placeBlock", (req, res) => {
     blockId = req.body.blockId
     console.log("Placed Block", blockId)
