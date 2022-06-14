@@ -32,7 +32,7 @@ class Game {
         this.pickedBlockId = -1
         this.pickedBlock = null
         this.placementHelper = null
-        this.placementCoords = { x: 0, z: 0, rot: 0 }
+        this.placementCoords = { x: 0, z: 0, rot: 0, fl: false }
         // koordynaty x i y od lewego gornego rogu planszy, ulozone jak axes. 
         //Rot ma wartosc 0-3, gdzie zero to oryginalna, a za kazde +1 obraca sie o 90 w prawo
 
@@ -53,7 +53,7 @@ class Game {
         });
 
         window.addEventListener("keydown", (e) => {
-            console.log(e.keyCode)
+            // console.log(e.keyCode)
             if (e.keyCode == 49) this.camera.position.set(0, 120, -180)
             if (e.keyCode == 50) this.camera.position.set(160, 160, -180)
             if (e.keyCode == 51) this.camera.position.set(0, 240, -0.1)
@@ -79,6 +79,11 @@ class Game {
 
                 let w = this.placementHelper.w
                 let h = this.placementHelper.h
+
+                if (e.keyCode == 70) {
+                    console.log("flip")
+                    this.placementHelper.flip()
+                }
 
                 if (e.keyCode == 87 && this.placementCoords.z > 0) {
                     // Move helper up
@@ -147,6 +152,8 @@ class Game {
 
             console.log(this.board)
 
+            this.placementCoords.fl = this.placementHelper.flipped
+
             this.placementHelper = null
 
             //removes block button from ui
@@ -186,6 +193,8 @@ class Game {
         )
 
         block.setRotation(coords.rot + 2)
+
+        if (coords.fl) block.flip()
 
         // block.position.set(
         //     65 - unrotx,
@@ -303,6 +312,7 @@ class Game {
         if (!this.yourTurn) return
 
         this.pickedBlockId = id
+        this.placementCoords.fl = false
 
         // safely delete old block
         if (this.placementHelper) {

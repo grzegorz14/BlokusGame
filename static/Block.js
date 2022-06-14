@@ -37,11 +37,20 @@ class Block extends THREE.Group {
     }
 
     flip() {
+        let arr = []
         for (let i = 0; i < this.h; i++) {
+            let row = []
             for (let j = 0; j < this.w; j++) {
-                //poggers
+                row.push(this.shape[i][this.w - j - 1])
             }
+            arr.push(row)
         }
+        this.shape = arr
+
+        this.segments.forEach(s => {
+            s.position.x = this.w * -10 - s.position.x
+        })
+        this.flipped = !this.flipped
     }
 
     fullRotate(left) {
