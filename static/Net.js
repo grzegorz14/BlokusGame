@@ -114,7 +114,7 @@ class Net {
                 this.gameEnd("YOU LOSE!")
                 await fetch("/resetRequest", { method: "post" })
             }
-            else if (data.finished == 2) { //both players finished
+            else if (data.finishedCounter == 2) { //both players finished
                 clearInterval(this.updateInterval)
                 const winner = data.points1 > data.points2 ? 1 : (data.points1 == data.points2 ? 0 : 2)
                 const points = this.game.player == 1 ? data.points1 : data.points2
@@ -125,6 +125,18 @@ class Net {
                     this.gameEnd(`YOU LOSE - ${points} POINTS!`)
                 }
                 await fetch("/resetRequest", { method: "post" })
+            }
+            else if (data.finishedCounter == 1 && !this.finished) { //opponent finished - you may take any number of moves
+                if (!this.game.yourTurn) { 
+                    clearInterval(this.timerInterval)
+                    this.ui.removeMist()
+                    this.ui.hide(this.ui.dialog)
+                    this.ui.hide(this.ui.counter)
+                    this.ui.moveTurnTile()
+                }
+
+                this.game.yourTurn = true
+                console.log("your move")
             }
             else if (!this.game.yourTurn && !this.game.moved && this.lastBlockId != data.blockId && data.blockId > -1) { //opponent moves
                 await this.placeBlock(data.blockId, data.coords)
@@ -185,12 +197,14 @@ class Net {
 
     finishButtonClick = async (player) => {
         if (!confirm("Are you sure? You won't take anymore turns.")) return
-
         console.log("Finish click, player " + player)
 
         this.finished = true
-
-        await fetch("/finished", { metod: "post" })
+        this.game.yourTurn = false
+        this.ui.moveTurnTile()
+        const body = JSON.stringify({ player: this.game.player })
+        const headers = { "Content-Type": "application/json" }
+        await fetch("/finishGame", { method: "post", headers, body })
     }
 
     gameEnd = (message) => {

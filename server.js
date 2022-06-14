@@ -33,14 +33,13 @@ var blockId = -1
 var players = []
 var points1 = 0
 var points2 = 0
-var finished = 0
+var finishedCounter = 0
 var win = null
 var reset = 0
 var sender = -1
 
 app.post("/addPlayer", (req, res) => {
     let login = req.body.login
-    console.log("Adding player: " + login)
 
     switch (players.length) {
         case 1:
@@ -61,6 +60,8 @@ app.post("/addPlayer", (req, res) => {
             res.json({ success: false, info: "The game is on! Wait until players finish or click reset button." })
             break
     }
+
+    console.log("Adding player: " + login)
 })
 
 app.post("/waitingForOpponent", (req, res) => {
@@ -79,20 +80,18 @@ app.post("/placeBlock", (req, res) => {
 })
 
 app.post("/getBlock", (req, res) => {
-    console.log("Got Block", blockId)
+    //console.log("Got Block", blockId)
     if (sender != req.body.player) {
-        res.json({ blockId, coords, win, points1, points2, finished })
+        res.json({ blockId, coords, win, points1, points2, finishedCounter })
         blockId = -1
     } else {
-        res.json({ blockId: -1, coords, win, points1, points2, finished })
+        res.json({ blockId: -1, coords, win, points1, points2, finishedCounter })
     }
 })
 
 app.post("/finishGame", (req, res) => {
-    finished += 1
-    if (finished == 2) {
-        win = points1 > points2 ? 1 : 2
-    }
+    finishedCounter += 1
+    res.json({ "ok": "ok" })
 })
 
 app.post("/win", (req, res) => {
@@ -119,7 +118,7 @@ function resetGame() {
     reset = 0
     blockId = -1
     players = []
-    finished = 0
+    finishedCounter = 0
     win = null
     points1 = 0
     points2 = 0
