@@ -7,7 +7,7 @@ class Segment extends THREE.Mesh {
         if (isHelper) {
             this.material = new THREE.MeshBasicMaterial({
                 side: THREE.DoubleSide,
-                map: new THREE.TextureLoader().load('textures/placeholder.png'),
+                map: new THREE.TextureLoader().load('textures/texture3.png'),
                 color: 0xff0000,
                 opacity: 0.5,
                 transparent: true,
@@ -17,14 +17,14 @@ class Segment extends THREE.Mesh {
             if (player == 1) {
                 this.material = new THREE.MeshBasicMaterial({
                     side: THREE.DoubleSide,
-                    map: new THREE.TextureLoader().load('textures/placeholder.png'),
-                    color: 0x0000ff
+                    map: new THREE.TextureLoader().load('textures/texture3.png'),
+                    color: 0x2222cc
                 })
             } else {
                 this.material = new THREE.MeshBasicMaterial({
                     side: THREE.DoubleSide,
-                    map: new THREE.TextureLoader().load('textures/placeholder.png'),
-                    color: 0x00ff00
+                    map: new THREE.TextureLoader().load('textures/texture3.png'),
+                    color: 0x22cc22
                 })
             }
         }
@@ -34,9 +34,9 @@ class Segment extends THREE.Mesh {
         this.material.opacity = 0.9
 
         if (player == 1) {
-            this.material.color.setHex(0x00ff00)
+            this.material.color.setHex(0x22cc22)
         } else {
-            this.material.color.setHex(0x0000ff)
+            this.material.color.setHex(0x2222cc)
         }
     }
 
