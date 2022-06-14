@@ -198,6 +198,15 @@ input[type="text"] {
     z-index: 11;
 }
 
+#yourCounter {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    font-size: 70px;
+    transform: translate(-50%, -50%);
+    z-index: 11;
+}
+
 .mist {
     background-color: black;
     opacity: 50%;

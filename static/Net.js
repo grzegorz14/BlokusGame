@@ -4,6 +4,7 @@ class Net {
         this.ui = ui
 
         this.timerInterval = null
+        this.yourTimerInterval = null
         this.updateInterval = null
 
         this.login = ""
@@ -85,6 +86,7 @@ class Net {
         }
         else {
             this.game.yourTurn = true
+            this.startYourTimer()
         }
 
         this.game.createBoard()
@@ -135,6 +137,7 @@ class Net {
                     this.ui.moveTurnTile()
                 }
 
+                this.startYourTimer()
                 this.game.yourTurn = true
                 console.log("your move")
             }
@@ -148,9 +151,12 @@ class Net {
 
                 document.getElementById("opponentPoints").innerText = this.game.opponent == 1 ? data.points1 : data.points2
 
+                this.startYourTimer()
                 this.game.yourTurn = true
             }
             else if (this.game.moved) {
+                this.ui.hide(this.ui.yourCounter)
+                clearInterval(this.timerInterval)
                 this.ui.moveTurnTile()
                 this.startTimer()
                 this.game.yourTurn = false
@@ -186,6 +192,18 @@ class Net {
                 this.ui.counter.textContent = secondsLeft
                 secondsLeft -= 1
             }
+        }, 1000)
+    }
+
+    startYourTimer = () => {
+        this.ui.show(this.ui.yourCounter)
+        let secondsLeft = 60
+        this.ui.yourCounter.innerText = secondsLeft
+        secondsLeft -= 1
+
+        this.timerInterval = setInterval(async () => {
+            this.ui.yourCounter.textContent = secondsLeft
+            secondsLeft -= 1
         }, 1000)
     }
 

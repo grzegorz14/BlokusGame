@@ -12,6 +12,7 @@ class Ui {
         this.opponentsBlocks = document.getElementById("opponentsBlocks")
         this.dialog = document.getElementById("dialog")
         this.counter = document.getElementById("counter")
+        this.yourCounter = document.getElementById("yourCounter")
         this.info = document.getElementById("info")
     }
 
