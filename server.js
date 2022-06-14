@@ -15,7 +15,7 @@ app.use(express.static("static"))
 app.use(express.urlencoded({ extended: true }))
 
 app.get("/", async function (req, res) {
-    res.sendFile(path.join(__dirname + "/static/index.html"))
+    res.sendFile(path.join(__dirname + "/static/html/index.html"))
 })
 
 const clearBoard = [ // 0 - empty, 1 - player 1 segment, 2 - player 2 segment
