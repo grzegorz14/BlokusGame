@@ -75,7 +75,7 @@ app.post("/placeBlock", (req, res) => {
 })
 
 app.post("/getBlock", (req, res) => {
-    res.json({ blockId, coords, win, points1, points2 })
+    res.json({ blockId, coords, win, points1, points2, finished })
     blockId = -1
 })
 
@@ -83,8 +83,7 @@ app.post("/finishGame", (req, res) => {
     finished += 1
     if (finished == 2) {
         win = points1 > points2 ? 1 : 2
-    }   
-    res.json({ success: true })
+    } 
 })
 
 app.post("/win", (req, res) => {

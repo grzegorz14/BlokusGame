@@ -9,6 +9,7 @@ class Net {
         this.login = ""
 
         this.lastBlockId = -1
+        this.finished = false
 
         this.audio = new Audio('./sounds/bad-piggies-drip.mp3')
 
@@ -24,6 +25,7 @@ class Net {
         }
 
         this.lastBlockId = -1
+        this.finished = false
 
         const body = JSON.stringify({ login })
         const headers = { "Content-Type": "application/json" }
@@ -165,12 +167,14 @@ class Net {
         this.lastBlockId = id
     }
 
-    finishButtonClick = (player) => {
+    finishButtonClick = async (player) => {
         if (!confirm("Are you sure? You won't take anymore turns.")) return
 
         console.log("Finish click, player " + player)
 
-        //fetch server here
+        this.finished = true
+
+        await fetch("/finished", { metod: "post" })
     }
 
     gameEnd = (message) => {
