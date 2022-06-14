@@ -12,6 +12,7 @@ class Block extends THREE.Group {
         this.h = this.shape.length
         this.xSize = this.shape[0].length
         this.zSize = this.shape.length
+        this.segments = []
 
         this.init()
     }
@@ -27,6 +28,7 @@ class Block extends THREE.Group {
                 if (this.shape[i][j] == 1) {
                     let segment = new Segment(this.player, this.isHelper)
                     segment.position.set(-10 * j - 5, 0, -10 * i - 5)
+                    this.segments.push(segment)
                     this.add(segment)
                 }
             }
@@ -137,6 +139,14 @@ class Block extends THREE.Group {
         }
 
         this.shape = res
+    }
+
+    materialize() {
+        this.segments.forEach(s => s.materialize(this.player))
+    }
+
+    placable(valid) {
+        this.segments.forEach(s => s.placable(valid))
     }
 }
 
