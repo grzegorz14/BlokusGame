@@ -10,6 +10,7 @@ class Net {
 
         this.lastBlockId = -1
         this.finished = false
+        this.firstAfterPass = false
 
         this.audio = new Audio('./sounds/bad-piggies-drip.mp3')
 
@@ -26,6 +27,7 @@ class Net {
 
         this.lastBlockId = -1
         this.finished = false
+        this.firstAfterPass = false
 
         const body = JSON.stringify({ login })
         const headers = { "Content-Type": "application/json" }
@@ -132,19 +134,6 @@ class Net {
                 }
                 await fetch("/resetRequest", { method: "post" })
             }
-            else if (data.finishedCounter == 1 && !this.finished) { //opponent finished - you may take any number of moves
-                if (!this.game.yourTurn) { 
-                    this.ui.removeMist()
-                    this.ui.hide(this.ui.dialog)
-                    this.ui.hide(this.ui.counter)
-                    this.ui.moveTurnTile()
-                }
-
-                clearInterval(this.timerInterval)
-                this.startYourTimer()
-                this.game.yourTurn = true
-                console.log("your move")
-            }
             else if (!this.game.yourTurn && !this.game.moved && this.lastBlockId != data.blockId && data.blockId > -1) { //opponent moves
                 await this.placeBlock(data.blockId, data.coords)
                 clearInterval(this.timerInterval)
@@ -165,12 +154,30 @@ class Net {
                 }
             }
             else if (this.game.moved) {
-                this.ui.hide(this.ui.yourCounter)
-                clearInterval(this.timerInterval)
-                this.ui.moveTurnTile()
-                this.startTimer()
-                this.game.yourTurn = false
+                if (data.finishedCounter == 1 && !this.finished) { //opponent finished - you may take any number of moves
+                    clearInterval(this.timerInterval)
+                    this.startYourTimer()
+                    this.game.yourTurn = true
+                }
+                else { //after your normal move
+                    this.ui.hide(this.ui.yourCounter)
+                    clearInterval(this.timerInterval)
+                    this.ui.moveTurnTile()
+                    this.startTimer()
+                    this.game.yourTurn = false
+                }
                 this.game.moved = false
+            }
+            else if (data.finishedCounter == 1 && !this.finished && !this.firstAfterPass) { //opponent just finished
+                this.ui.removeMist()
+                this.ui.hide(this.ui.dialog)
+                this.ui.hide(this.ui.counter)
+                this.ui.moveTurnTile()
+
+                clearInterval(this.timerInterval)
+                this.startYourTimer()
+                this.game.yourTurn = true
+                this.firstAfterPass = true
             }
         })
     }
