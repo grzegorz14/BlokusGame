@@ -36,11 +36,6 @@ class Game {
         // koordynaty x i y od lewego gornego rogu planszy, ulozone jak axes. 
         //Rot ma wartosc 0-3, gdzie zero to oryginalna, a za kazde +1 obraca sie o 90 w prawo
 
-        // <DEBUG>
-        const axesHelper = new THREE.AxesHelper(100)
-        this.scene.add(axesHelper)
-        // </DEBUG>
-
         // onClick on object
         let object = null
         window.addEventListener("mousedown", async (e) => {
@@ -173,13 +168,24 @@ class Game {
         this.scene.add(block)
 
         // position in default rotation on current position
+        console.log(coords)
+
+        let xMod = coords.rot % 2 == 0 ? block.w : block.h
+        let yMod = coords.rot % 2 == 0 ? block.h : block.w
+
         block.position.set(
-            coords.x * 10 - 70 + 10 * block.h,
+            -70 + (coords.x + xMod) * 10,
             0,
-            coords.z * 10 - 70 + 10 * block.w
+            -70 + (coords.z + yMod) * 10
         )
 
         block.setRotation(coords.rot + 2)
+
+        // block.position.set(
+        //     65 - unrotx,
+        //     0,
+        //     65 - unrotz
+        // )
 
         let w = block.w
         let h = block.h
@@ -275,6 +281,7 @@ class Game {
 
                         if (count > 1) {
                             if (this.board[this.placementCoords.z + i - top][this.placementCoords.x + j - left] == this.player) {
+                                console.log(i, j)
                                 connected = true
                             }
                         }
