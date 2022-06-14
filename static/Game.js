@@ -53,7 +53,13 @@ class Game {
         });
 
         window.addEventListener("keydown", (e) => {
-            if (this.placementHelper) {
+            console.log(e.keyCode)
+            if (e.keyCode == 49) this.camera.position.set(0, 120, -180)
+            if (e.keyCode == 50) this.camera.position.set(160, 160, -180)
+            if (e.keyCode == 51) this.camera.position.set(0, 240, -0.1)
+            this.camera.lookAt(this.scene.position)
+
+            if (this.placementHelper && this.yourTurn) {
                 // Movement Code
                 if (e.keyCode == 81) {
                     // Rotate Helper Left

@@ -13,6 +13,7 @@ class Block extends THREE.Group {
         this.xSize = this.shape[0].length
         this.zSize = this.shape.length
         this.segments = []
+        this.filpped = false
 
         this.init()
     }
@@ -31,6 +32,14 @@ class Block extends THREE.Group {
                     this.segments.push(segment)
                     this.add(segment)
                 }
+            }
+        }
+    }
+
+    flip() {
+        for (let i = 0; i < this.h; i++) {
+            for (let j = 0; j < this.w; j++) {
+                //poggers
             }
         }
     }
