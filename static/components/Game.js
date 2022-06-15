@@ -82,7 +82,7 @@ class Game {
 
                 if (e.keyCode == 70) {
                     //console.log("flip")
-                    this.placementHelper.flip()
+                    //this.placementHelper.flip()
                 }
 
                 if (e.keyCode == 87 && this.placementCoords.z > 0) {
