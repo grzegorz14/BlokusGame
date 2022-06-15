@@ -150,7 +150,8 @@ class Net {
                     this.ui.hide(this.ui.dialog)
                     this.ui.hide(this.ui.counter)
                     this.ui.moveTurnTile()
-    
+
+                    document.getElementById("opponent" + data.blockId)?.remove()
                     document.getElementById("opponentPoints").innerText = this.game.opponent == 1 ? data.points1 : data.points2
     
                     this.startYourTimer()
